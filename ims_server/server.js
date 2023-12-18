@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require("express");
 const https = require('https');
 const fs = require('fs');
+const cors = require('cors');
+
 
 const { Pool } = require('pg');
 
@@ -23,11 +25,13 @@ const options = {
 
 //Main
 const app=express();
-const server_port=process.env.SERVER_PORT || 9000;
+const server_port=process.env.SERVER_PORT || 8600;
 
 app.get("/",(req,res)=>{
     res.send("Message from Server");
 });
+
+app.use(cors());
 
 app.get('/data', async (req, res) => {
     try {

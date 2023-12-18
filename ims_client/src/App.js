@@ -1,10 +1,12 @@
+
 import React,{useEffect, useState} from 'react'
 
 function App() {
   const [backendData, setBackendData] = useState([{}]);
   
   useEffect(()=>{
-    fetch("/data").then(
+    fetch(`https://localhost:5600/data`).then(
+//    fetch(`https://localhost:${process.env.MSPORT}/data`).then(
       response=>response.json()
     ).then(
       data=>setBackendData(data)
