@@ -1,0 +1,37 @@
+CREATE TABLE ims_schema.users(
+	user_id INT PRIMARY KEY,
+	first_name VARCHAR(20) NOT NULL,
+	mid_name VARCHAR(20),
+	last_name VARCHAR(20) NOT NULL,
+	dob DATE,
+	email VARCHAR(50) NOT NULL UNIQUE,
+	phone VARCHAR(10) NOT NULL UNIQUE
+);
+
+CREATE TABLE ims_schema.suppliers(
+	supplier_id INT PRIMARY KEY,
+	supplier_name VARCHAR(50) UNIQUE,
+	pno INT NOT NULL UNIQUE,
+	email VARCHAR(50),
+	no_of_products INT
+);
+
+CREATE TABLE ims_schema.products(
+	product_id INT PRIMARY KEY,
+	product_name VARCHAR(100) NOT NULL UNIQUE,
+	brand VARCHAR(50) NOT NULL,
+	price INT NOT NULL,
+	supplier VARCHAR(50) ,
+	FOREIGN KEY(supplier) REFERENCES ims_schema.suppliers(supplier_name)
+);
+
+
+CREATE TABLE ims_schema.stock(
+	product_id INT PRIMARY KEY, 
+	product_name VARCHAR(100) NOT NULL,
+	quantity INT,
+	FOREIGN KEY(product_id) REFERENCES ims_schema.products(product_id),
+	FOREIGN KEY(product_name) REFERENCES ims_schema.products(product_name)
+);
+
+

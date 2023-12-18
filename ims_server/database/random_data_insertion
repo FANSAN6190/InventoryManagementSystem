@@ -1,0 +1,40 @@
+-- Inserting users
+INSERT INTO ims_schema.users(user_id, first_name, mid_name, last_name, dob, email, phone)
+VALUES 
+(300, 'John', null, 'Doe', '1980-01-01', 'john.doe@example.com', '1234567890'),
+(301, 'Jane', null, 'Smith', '1985-02-02', 'jane.smith@example.com', '0987654321');
+
+-- Inserting suppliers
+INSERT INTO ims_schema.suppliers(supplier_id, supplier_name, pno, email, no_of_products)
+VALUES 
+(200, 'Best Supplier', 1234567890, 'best.supplier@example.com', 100),
+(201, 'Great Supplier', 0987654321, 'great.supplier@example.com', 200),
+(202, 'Awesome Supplier', 1122334455, 'awesome.supplier@example.com', 300);
+
+-- Inserting products
+INSERT INTO ims_schema.products(product_id, product_name, brand, price, supplier)
+VALUES 
+(100, 'mot_g54', 'Motorola', 100, 'Best Supplier'),
+(101, 'nok_g55', 'Nokia', 200, 'Great Supplier'),
+(102, 'lg_g56', 'LG', 300, 'Awesome Supplier'),
+(103, 'hp_g57', 'HP', 400, 'Best Supplier'),
+(104, 'nes_g58', 'Nestle', 500, 'Great Supplier'),
+(105, 'mot_g59', 'Motorola', 600, 'Awesome Supplier'),
+(106, 'nok_g60', 'Nokia', 700, 'Best Supplier'),
+(107, 'lg_g61', 'LG', 800, 'Great Supplier'),
+(108, 'hp_g62', 'HP', 900, 'Awesome Supplier'),
+(109, 'nes_g63', 'Nestle', 1000, 'Best Supplier');
+
+-- Inserting stock
+INSERT INTO ims_schema.stock(product_id, product_name, quantity)
+VALUES 
+(100, 'mot_g54', 50),
+(101, 'nok_g55', 100),
+(102, 'lg_g56', 150),
+(103, 'hp_g57', 200),
+(104, 'nes_g58', 250),
+(105, 'mot_g59', 300),
+(106, 'nok_g60', 350),
+(107, 'lg_g61', 400),
+(108, 'hp_g62', 450),
+(109, 'nes_g63', 500);
