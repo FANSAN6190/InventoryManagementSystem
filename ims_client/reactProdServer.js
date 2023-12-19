@@ -4,10 +4,10 @@ const express = require('express');
 const https = require('https');
 const fs = require('fs');
 
-const server_port=process.env.RSPORT || 8800;
+const react_server_port=process.env.PORT || 8800;
 const options = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
+    key: fs.readFileSync('../key.pem'),
+    cert: fs.readFileSync('../cert.pem')
 };
 
 const path = require('path');
@@ -18,8 +18,8 @@ app.get('/*', function (req, res) {
 });
 
 // Listening
-https.createServer(options, app).listen(server_port, () => {
-    console.log(`React Production Server running at Port:${server_port}`);
-    const url = `https://localhost:${server_port}`;
+https.createServer(options, app).listen(react_server_port, () => {
+    console.log(`React Production Server running at Port:${react_server_port}`);
+    const url = `https://localhost:${react_server_port}`;
     console.log(`URL: ${url}`);
   });

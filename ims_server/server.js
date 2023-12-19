@@ -5,9 +5,8 @@ const https = require('https');
 const fs = require('fs');
 const cors = require('cors');
 
-
+// Database connection and credentials
 const { Pool } = require('pg');
-
 const pool = new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
@@ -16,19 +15,19 @@ const pool = new Pool({
     port: process.env.PGPORT,
 });
 
-
 // Loading SSL certificate and key
 const options = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
+    key: fs.readFileSync('../key.pem'),
+    cert: fs.readFileSync('../cert.pem')
 };
 
-//Main
+
+//----------------------------Main------------------------------//
 const app=express();
 const server_port=process.env.SERVER_PORT || 8600;
 
 app.get("/",(req,res)=>{
-    res.send("Message from Server");
+    res.send("This is IMS Server root api");
 });
 
 app.use(cors());
@@ -49,6 +48,8 @@ app.get('/data', async (req, res) => {
 app.post("/post",(req,res)=>{
     res.send("Hello from Server");
 });
+
+//--------------------------------------------------------------//
 
 
 // Listening
