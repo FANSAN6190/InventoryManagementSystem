@@ -1,6 +1,8 @@
-
-import React,{useEffect, useState} from 'react'
-import Login from './components/user/Login';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Main from './components/Main/Main';
+import Dashboard from './components/Dashboard/Dashboard';
+import MainContent from './components/Main/MainContent';
 
 function App() {
   const [backendData, setBackendData] = useState([{}]);
@@ -16,26 +18,14 @@ function App() {
   console.log(backendData.results);
 
   return (
-    // <div>
-    //   {(typeof backendData.results==='undefined')?(
-    //     <p>Loading...</p>
-    //   ):(backendData.results.map((user,i) => {
-    //     return (
-    //       <div key={i}>
-    //         <h1>User {i+1}</h1>
-    //         <p>User_ID: {user.user_id}</p>
-    //         <p>First Name: {user.first_name}</p>
-    //         <p>Midle Name: {user.mid_name}</p>
-    //         <p>Last Name: {user.last_name}</p>
-    //         <p>DOB: {new Date(user.dob).toLocaleDateString()}</p>
-    //         <p>Email: {user.email}</p>
-    //         <p>Phone No.: {user.phone}</p>
-    //       </div>
-    //     )
-    //   }))
-    //   }
-    // </div>
-    <Login></Login>
+    <Router>
+      <Main>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard data={backendData} />} />
+          <Route path="/" element={<MainContent data={backendData} />} />
+        </Routes>
+      </Main>
+    </Router>
   )
 }
 
