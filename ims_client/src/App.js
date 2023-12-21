@@ -31,5 +31,4 @@ function App() {
   )
 }
 inject();
-SpeedInsights();
 export default App
