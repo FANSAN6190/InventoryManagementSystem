@@ -1,3 +1,5 @@
+import { SpeedInsights } from "@vercel/speed-insights/react"
+import { inject } from '@vercel/analytics';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Main from './components/Main/Main';
@@ -28,5 +30,6 @@ function App() {
     </Router>
   )
 }
-
+inject();
+SpeedInsights();
 export default App
