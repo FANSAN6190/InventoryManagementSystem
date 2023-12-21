@@ -1,9 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import NavPane from './NavPane/NavPane';
-import Dashboard from '../Dashboard/Dashboard'; // Import your Dashboard component
-import PropTypes from 'prop-types'
 import { Button } from 'react-bootstrap';
+import MainContent from './MainContent';
 
 
 const mainStyle={
@@ -30,21 +28,7 @@ class Main extends React.Component {
             <div className={"container-fluid"} style={mainStyle} >
                 <NavPane></NavPane>
                 <div className={"container-fluid"} style={mainContentStyle}>
-                    <br></br>
-                    <h1>Welcome to Our Website!</h1>
-                    <span style={{display: 'flex', justifyContent: 'center', height: '100%', paddingBottom:'50px'}}>
-                        <img style={{height:'20%', width:'80%'}} src={process.env.PUBLIC_URL + '/ims_home_pic7.png'}/>
-                    </span>      
-                    <h2>
-                        Manage your inventory with ease!
-                    </h2>
-                    <h3>
-                        Get Started by Registering or Logging In!
-                    </h3>        
-                    <div style={{display: 'flex', justifyContent: 'center'}}>
-                        <Button variant="primary" style={{marginRight: '10px'}}>Login</Button>
-                        <Button variant="success">Register</Button>
-                    </div>
+                    {this.props.children}
                 </div>
             </div>
         );

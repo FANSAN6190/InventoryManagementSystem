@@ -1,16 +1,8 @@
-import React, { useEffect, useState } from "react";
+//import React, { useEffect, useState } from "react";
 
 import styled from "styled-components";
-import {
-  BrowserRouter as Router,
-  Route,
-  useNavigate,
-  Routes,
-  Link,
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
-
-import Dashboard from "../../Dashboard/Dashboard";
 
 const StyledNavLink = styled(Link)`
   border-radius: 10px;
@@ -28,7 +20,6 @@ const StyledNavLink = styled(Link)`
     background-color: #d2e6fa;
   }
 `;
-
 const StyledNavbar = styled(Navbar)`
   float: left;
   display: flex;
@@ -64,45 +55,40 @@ const StyledDropdownItem = styled(NavDropdown.Item)`
   background-color: white;
 `;
 function NavPane() {
-  const [Navcontent, setNavContent] = useState("home");
-  const [open, setOpen] = useState(true);
+  // const [Navcontent, setNavContent] = useState("home");
+  // const [open, setOpen] = useState(true);
 
-  const handleClick = (newNavContent) => {
-    setNavContent(newNavContent);
-  };
+  // const handleClick = (newNavContent) => {
+  //   setNavContent(newNavContent);
+  // };
 
-  useEffect(() => {
-    console.log(Navcontent);
-  }, [Navcontent]);
+  // useEffect(() => {
+  //   console.log(Navcontent);
+  // }, [Navcontent]);
 
   return (
-    <Router>
-      <StyledNavbar collapseOnSelect expand="lg">
-        <Navbar.Brand href="#home">Inventory Management System</Navbar.Brand>
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">
-          <Nav className="mr-auto">
-            <Nav.Link as={StyledNavLink} href="#home">
-              Home
-            </Nav.Link>
-            <Nav.Link as={StyledNavLink} to="/dashboard">
-              Dashboard
-            </Nav.Link>
-            <NavDropdown title="Others" id="collasible-nav-dropdown">
-              <StyledDropdownItem href="#products">Products</StyledDropdownItem>
-              <StyledDropdownItem href="#suppliers">
-                Suppliers
-              </StyledDropdownItem>
-              <StyledDropdownItem href="#orders">Orders</StyledDropdownItem>
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </StyledNavbar>
-
-      <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <StyledNavbar collapseOnSelect expand="lg">
+      <Navbar.Brand href="/" style={{display: "flex"}}>
+        <img src={process.env.PUBLIC_URL + "/logo1.png"}
+          width="60"
+          height="60"
+          className="d-inline-block align-top"
+          alt="My Website Logo"/>
+        <h4 className="text-muted" style={{marginTop:'15px', marginLeft:'10px'}}>Inventory Management System</h4>
+      </Navbar.Brand>
+      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <Navbar.Collapse id="responsive-navbar-nav">
+        <Nav className="mr-auto">
+          <Nav.Link as={StyledNavLink} to="/">Home</Nav.Link>
+          <Nav.Link as={StyledNavLink} to="/dashboard">Dashboard</Nav.Link>
+          <NavDropdown style={{marginTop:'5px', marginLeft:'10px'}} title="Others" id="collasible-nav-dropdown">
+            <StyledDropdownItem href="#products">Products</StyledDropdownItem>
+            <StyledDropdownItem href="#suppliers">Suppliers</StyledDropdownItem>
+            <StyledDropdownItem href="#orders">Orders</StyledDropdownItem>
+          </NavDropdown>
+        </Nav>
+      </Navbar.Collapse>
+    </StyledNavbar>
   );
 }
 
