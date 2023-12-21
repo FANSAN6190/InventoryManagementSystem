@@ -1,7 +1,5 @@
 import React from 'react';
 import NavPane from './NavPane/NavPane';
-import { Button } from 'react-bootstrap';
-import MainContent from './MainContent';
 
 
 const mainStyle={

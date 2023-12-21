@@ -82,9 +82,15 @@ function NavPane() {
           <Nav.Link as={StyledNavLink} to="/">Home</Nav.Link>
           <Nav.Link as={StyledNavLink} to="/dashboard">Dashboard</Nav.Link>
           <NavDropdown style={{marginTop:'5px', marginLeft:'10px'}} title="Others" id="collasible-nav-dropdown">
-            <StyledDropdownItem href="#products">Products</StyledDropdownItem>
-            <StyledDropdownItem href="#suppliers">Suppliers</StyledDropdownItem>
-            <StyledDropdownItem href="#orders">Orders</StyledDropdownItem>
+            <StyledDropdownItem>
+              <Link to="/products">Products</Link>
+            </StyledDropdownItem>
+            <StyledDropdownItem>
+              <Link to="/suppliers">Suppliers</Link>
+            </StyledDropdownItem>
+            <StyledDropdownItem>
+              <Link to="/orders">Orders</Link>
+            </StyledDropdownItem>
           </NavDropdown>
         </Nav>
       </Navbar.Collapse>

@@ -35,8 +35,35 @@ app.use(cors());
 app.get('/data', async (req, res) => {
     try {
       const client = await pool.connect();
-      const result = await client.query('SELECT * FROM ims_schema.users');
-      const results = { 'results': (result) ? result.rows : null};
+      const userResult = await client.query('SELECT * FROM ims_schema.users');
+      //select * from ims_schema.products;
+      const results = { 'results': (userResult) ? userResult.rows : null};
+      client.release();
+      console.log(results);
+      return res.json(results);
+    } catch (err) {
+      console.error(err);
+    }
+});
+
+app.get('/products', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      const productResult = await client.query('SELECT * FROM ims_schema.products');
+      const results = { 'results': (productResult) ? productResult.rows : null};
+      client.release();
+      console.log(results);
+      return res.json(results);
+    } catch (err) {
+      console.error(err);
+    }
+});
+
+app.get('/suppliers', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      const supplierResult = await client.query('SELECT * FROM ims_schema.suppliers');
+      const results = { 'results': (supplierResult) ? supplierResult.rows : null};
       client.release();
       console.log(results);
       return res.json(results);
