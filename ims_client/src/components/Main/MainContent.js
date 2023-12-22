@@ -1,7 +1,9 @@
 import React, { Fragment } from "react";
 import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function MainContent() {
+  const navigate = useNavigate();
   return (
     <Fragment>
       <br></br>
@@ -19,10 +21,14 @@ function MainContent() {
       <h2>Manage your inventory with ease!</h2>
       <h3>Get Started by Registering or Logging In!</h3>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Button variant="primary" style={{ marginRight: "10px" }}>
-          Login
-        </Button>
-        <Button variant="success">Register</Button>
+        <Button variant="primary" style={{ marginRight: "10px" }} 
+        onClick={() => {
+          navigate("/login");
+        }}>Login</Button>
+        <Button variant="success" 
+        onClick={() => {
+          navigate("/register");
+        }}>Register</Button>
       </div>
     </Fragment>
   );

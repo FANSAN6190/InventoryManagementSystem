@@ -27,7 +27,7 @@ function Login() {
     }
   }
   return (
-    <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh', backgroundColor:'lightgray'}}>
+    <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'90vh'}}>
       <form class={"p-3 mb-2 bg-secondary bg-gradient text-white"} style={formStyle} onSubmit={handleSubmit}>
         <h1><strong>Login</strong></h1>
         <div class="form-group">
