@@ -1,5 +1,6 @@
 import React from 'react';
 import NavPane from './NavPane/NavPane';
+import User from '../../imsdb';
 
 
 const mainStyle={

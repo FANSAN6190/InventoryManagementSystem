@@ -89,7 +89,7 @@ function NavPane() {
               <Link to="/suppliers">Suppliers</Link>
             </StyledDropdownItem>
             <StyledDropdownItem>
-              <Link to="/orders">Orders</Link>
+              <Link to="/api/user">Orders</Link>
             </StyledDropdownItem>
           </NavDropdown>
         </Nav>

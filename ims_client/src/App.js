@@ -9,6 +9,7 @@ import MainContent from "./components/Main/MainContent";
 import ProductDetails from "./components/ProductDetails/ProductDetails";
 import SupplierDetails from "./components/suppliers/Suppliers";
 import Login from "./components/user/Login";
+import UserTable from "./imsdb";
 
 function App() {
   useEffect(() => {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/products" element={<ProductDetails />} />
           <Route path="/suppliers" element={<SupplierDetails />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/api/user" element={<UserTable />} />
         </Routes>
       </Main>
       <SpeedInsights />
