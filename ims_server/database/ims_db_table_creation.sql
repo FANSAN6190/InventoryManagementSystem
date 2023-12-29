@@ -18,6 +18,7 @@ CREATE TABLE ims_schema.inventory(
 	inventory_name VARCHAR(100),
 	user_name VARCHAR(20) NOT NULL REFERENCES ims_schema.users(user_name),
 	no_of_products INT DEFAULT 0,
+	product_catalogue JSONB,
 	total_volume INT DEFAULT 0,
 	inventory_worth NUMERIC(10, 2) DEFAULT 0.00,
 	last_update TIMESTAMP,
@@ -81,4 +82,8 @@ CREATE TABLE ims_schema.transactions(
 	transaction_type VARCHAR NOT NULL,
 	transaction_date_time TIMESTAMP NOT NULL,
 	transaction_amount NUMERIC(10, 2) NOT NULL
+	CHECK (
+        (customer_order_id IS NULL)::integer + 
+        (supplier_order_id IS NULL)::integer = 1
+    )
 );

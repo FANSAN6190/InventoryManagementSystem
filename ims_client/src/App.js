@@ -10,6 +10,7 @@ import ProductDetails from "./components/ProductDetails/ProductDetails";
 import SupplierDetails from "./components/suppliers/Suppliers";
 import Login from "./components/user/Login";
 import UserTable from "./imsdb";
+import Register from "./components/user/Register";
 
 function App() {
   useEffect(() => {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/products" element={<ProductDetails />} />
           <Route path="/suppliers" element={<SupplierDetails />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/api/user" element={<UserTable />} />
         </Routes>
       </Main>

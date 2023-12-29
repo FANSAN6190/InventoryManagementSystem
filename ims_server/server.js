@@ -4,6 +4,7 @@ const express = require("express");
 const https = require('https');
 const fs = require('fs');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 // Database connection and credentials
 const { Pool } = require('pg');
@@ -71,27 +72,36 @@ app.get('/suppliers', async (req, res) => {
       console.error(err);
     }
 });
-app.post('/api/authenticate', async (req, res) => {
+
+app.use(express.json());
+app.post('/login', async (req, res) => {
+  let client;
   try {
     const client = await pool.connect();
     const { email, phone, password } = req.body;
+    const userResult = await client.query('SELECT * FROM ims_schema.users WHERE email = $1 AND phone_no = $2', [email, phone]);
 
-    const userResult = await client.query('SELECT * FROM ims_schema.users WHERE email = $1 AND phone = $2 ', [email, phone]);
-    
     if (userResult.rows.length > 0) {
-      // User found and authenticated
-      res.json({ status: 'success', message: 'User authenticated', user: userResult.rows[0] });
-      console.log("Server: Authentication successful")
+      const user = userResult.rows[0];
+      const match = await bcrypt.compare(password, user.hash_pwd);
+      if (match) {
+        console.log("Server: Authentication successful")
+        res.json({ status: 'success', message: 'User authenticated', user: userResult.rows[0] });
+        
+      } else {
+        console.log("Authentication Failed :: Incorrect Password");
+      }
+      
     } else {
       // User not found or password incorrect
-      console.log("Server: Authentication failed")
+      console.log("Authentication Failed :: User not Found")
       res.status(401).json({ status: 'fail', message: 'Authentication failed' });
     }
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 'error', message: 'An error occurred during authentication' });
   } finally {
-    client.release();
+    client?.release();
   }
 });
 
@@ -99,9 +109,6 @@ app.post('/api/authenticate', async (req, res) => {
 app.post("/post",(req,res)=>{
     res.send("Hello from Server");
 });
-
-
-
 
 //------------------------------------------------------------ -//
 

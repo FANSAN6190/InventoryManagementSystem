@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 function Login() {
   const formStyle = {
@@ -20,40 +20,40 @@ function Login() {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
 
-    async function sendLoginData(event) {
-      event.preventDefault();
-
-      try {
-        const response = await fetch('https://localhost:5600/api/authenticate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            phone: phone,
-            password: password
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          console.log("Successful login");
-          alert(`Welcome ${data.name}!, you have successfully logged in!`)
-        } else {
-          console.log("Failed login");
-          alert('Login failed.');
-        }
-      } catch (error) {
+    const sendLoginData = useCallback(() => {
+      fetch('https://localhost:5600/login', { // replace with your server's address and port
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, phone, password }),
+      })
+      .then(response => response.json())
+      .then(data => console.log("received :",data))
+      .catch((error) => {
         console.error('Error:', error);
-        alert('An error occurred while trying to log in.');
-      }
+      });
+    }, [email, phone, password]);
+
+    const setValues = async(event)=>{
+      event.preventDefault();
+      setEmail(document.getElementById('loginEmail').value);
+      setPhone(document.getElementById('loginPno').value);
+      setPassword(document.getElementById('loginPassword').value);
     }
-      
+    useEffect(() => {
+      if (email && phone && password) {
+        console.log("tes1 ",email, phone, password);
+        sendLoginData();
+      }
+      else{
+        console.log("enter all values");
+      }
+    }, [email, phone, password,sendLoginData]);
+
     return (
       <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'90vh'}}>
-        <form class={"p-3 mb-2 bg-secondary bg-gradient text-white"} style={formStyle} onSubmit={sendLoginData}>
+        <form class={"p-3 mb-2 bg-secondary bg-gradient text-white"} style={formStyle} onSubmit={setValues}>
           <h1><strong>Login</strong></h1>
           <div class="form-group">
             <label for="loginEmail">Email address</label>
@@ -80,43 +80,3 @@ function Login() {
 }
 
 export default Login
-
-
-/* const handleSubmit = async (event) => {      
-      const updateValues = new Promise((resolve, reject) => {
-        setEmail(document.getElementById('loginEmail').value);
-        setPhone(document.getElementById('loginPno').value);
-        setPassword(document.getElementById('loginPassword').value);
-        event.preventDefault();
-        resolve();
-      });
-      await updateValues;
-      console.log("tes1 ",email, phone, password);
-      console.log("tes2 ",email, phone, password);
-
-      await Promise.all();
-      
-      if (!email || !phone) {
-        alert('Please enter either an email address or a phone number.');
-        return;
-      }
-
-      const response = await fetch('/api/authenticate', { // replace '/api/authenticate' with your server endpoint
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, phone, password }),
-      });
-    
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Successfull login");
-        alert(`Welcome ${data.name}!, you have successfully logged in!`)
-      } else {
-        console.log("Failed login");
-        alert('Login failed.');
-      }
-    }   */
-
-    
