@@ -43,7 +43,6 @@ function Login() {
     }
     useEffect(() => {
       if (email && phone && password) {
-        console.log("tes1 ",email, phone, password);
         sendLoginData();
       }
       else{
