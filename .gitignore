@@ -25,5 +25,5 @@ yarn-error.log*
 #
 .env
 *.pem
-node_modules/.cache/
+ims_client/node_modules/.cache/
 .vercel
