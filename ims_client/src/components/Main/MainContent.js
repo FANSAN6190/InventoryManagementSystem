@@ -1,28 +1,47 @@
 import React, { Fragment } from "react";
 import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function MainContent() {
+  const navigate = useNavigate();
   return (
     <Fragment>
       <br></br>
       <h1>Welcome to Our Website!</h1>
-      <span style={{
+      <span
+        style={{
           display: "flex",
           justifyContent: "center",
           height: "100%",
           paddingBottom: "50px",
-        }}>
-        <img style={{ height: "20%", width: "80%" }}
+        }}
+      >
+        <img
+          style={{ height: "20%", width: "80%" }}
           src={process.env.PUBLIC_URL + "/ims_home_pic7.png"}
-          alt="ims_home_pic7"/>
+          alt="ims_home_pic7"
+        />
       </span>
       <h2>Manage your inventory with ease!</h2>
       <h3>Get Started by Registering or Logging In!</h3>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Button variant="primary" style={{ marginRight: "10px" }}>
+        <Button
+          variant="primary"
+          style={{ marginRight: "10px" }}
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
           Login
         </Button>
-        <Button variant="success">Register</Button>
+        <Button
+          variant="success"
+          onClick={() => {
+            navigate("/register");
+          }}
+        >
+          Register
+        </Button>
       </div>
     </Fragment>
   );
