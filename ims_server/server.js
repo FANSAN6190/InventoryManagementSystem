@@ -74,6 +74,39 @@ app.get('/suppliers', async (req, res) => {
 });
 
 app.use(express.json());
+app.post('/register', async(req, res) => {
+  const {userName, fullName, dob, email, countryCode, phoneNo, password, confirmPass} = req.body;
+  console.log("server received :: "+ userName +" "+ fullName +" "+ dob +" "+ email +" "+ countryCode +" "+ phoneNo +" "+ password +" "+ confirmPass);
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  console.log("server received :: "+ userName +" "+ fullName +" "+ dob +" "+ email +" "+ countryCode +" "+ phoneNo +" "+ hashedPassword);
+
+  // Connect to the database
+  const client = await pool.connect();
+  try {
+    // Insert the user data into the database
+    const { rows } = await client.query('SELECT nextval(\'ims_schema.user_code_seq\')');
+    const userCounter = rows[0].nextval;
+    const userCode = userName.substring(0, 4) + phoneNo.substring(phoneNo.length - 4) + String(userCounter).padStart(4, '0');
+
+    const insertUserQuery = `
+      INSERT INTO ims_schema.users(user_code, user_name, full_name, dob, email, country_code, phone_no, hash_pwd)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `;
+    const values = [userCode,userName, fullName, dob, email, countryCode, phoneNo, hashedPassword];
+    console.log(values);
+    await client.query(insertUserQuery, values);
+    
+    // Send a success response
+    res.status(201).json({ status: 'success', message: 'Server Response : User registered successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: 'Server Response : An error occurred during registration' });
+  } finally {
+    client.release();
+  }
+});
+
 app.post('/login', async (req, res) => {
   let client;
   try {
@@ -85,17 +118,16 @@ app.post('/login', async (req, res) => {
       const user = userResult.rows[0];
       const match = await bcrypt.compare(password, user.hash_pwd);
       if (match) {
-        console.log("Server: Authentication successful")
-        res.json({ status: 'success', message: 'User authenticated', user: userResult.rows[0] });
-        
+        console.log("Server Response : Authentication successful")
+        res.json({ status: 'success', message: 'Server Response : Authentication successful', user: userResult.rows[0] }); 
       } else {
-        console.log("Authentication Failed :: Incorrect Password");
+        console.log("Server Response : Authentication Failed :: Incorrect Password");
+        res.status(401).json({ status: 'fail', message: 'Server Response : Authentication Failed :: Incorrect Password' });
       }
       
     } else {
-      // User not found or password incorrect
-      console.log("Authentication Failed :: User not Found")
-      res.status(401).json({ status: 'fail', message: 'Authentication failed' });
+      console.log("Server Response : Authentication Failed :: User not Found")
+      res.status(401).json({ status: 'fail', message: 'Server Response : Authentication Failed :: User not Found' });
     }
   } catch (err) {
     console.error(err);
@@ -104,12 +136,6 @@ app.post('/login', async (req, res) => {
     client?.release();
   }
 });
-
-
-app.post("/post",(req,res)=>{
-    res.send("Hello from Server");
-});
-
 //------------------------------------------------------------ -//
 
 
