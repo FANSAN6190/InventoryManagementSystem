@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const formStyle = {
@@ -18,6 +19,8 @@ function Login() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   const sendLoginData = useCallback(() => {
     fetch("http://localhost:5600/login", {
@@ -27,11 +30,17 @@ function Login() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, phone, password }),
+      
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "fail") {
-          window.location.href = "/login";
+          //window.location.href = "/login";
+          console.log("Login Failed, try again");
+        } else if (data.token) {
+          localStorage.setItem('token', data.token);
+          setIsLoggedIn(true); // set isLoggedIn to true
+          //window.location.href = "/home";
         }
         console.log("received :", data);
       })
@@ -54,8 +63,14 @@ function Login() {
     }
   }, [email, phone, password, sendLoginData]);
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/products");
+    }
+  }, [isLoggedIn, navigate]);
+  
   return (
-    <div
+  <div
       style={{
         display: "flex",
         justifyContent: "center",

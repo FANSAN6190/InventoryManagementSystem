@@ -2,7 +2,7 @@
 
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, NavDropdown, Button } from "react-bootstrap";
 
 const StyledNavLink = styled(Link)`
   border-radius: 10px;
@@ -54,6 +54,25 @@ const StyledDropdownItem = styled(NavDropdown.Item)`
   }
   background-color: white;
 `;
+function logout() {
+  fetch('/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      console.log('Logged out successfully');
+      localStorage.removeItem('token');
+    } else {
+      console.log('Logout failed');
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
 function NavPane() {
   // const [Navcontent, setNavContent] = useState("home");
   // const [open, setOpen] = useState(true);
@@ -92,7 +111,8 @@ function NavPane() {
               <Link to="/api/user">Orders</Link>
             </StyledDropdownItem>
           </NavDropdown>
-        </Nav>
+          <Button as={StyledNavLink} onClick={logout}>Logout</Button>
+        </Nav>  
       </Navbar.Collapse>
     </StyledNavbar>
   );

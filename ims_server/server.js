@@ -7,7 +7,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const jwt = require('jsonwebtoken');
 
+let user_name;
+let user_code;
 // Database connection and credentials
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -29,44 +32,7 @@ const options = {
 const app=express();
 const server_port=process.env.SERVER_PORT || 8600;
 
-//--------------------Session Handling-------------------------//
-app.use(session({
-  store: new pgSession({
-    pool: pool, // Use your existing PostgreSQL connection pool
-    tableName: "session" // Optional. Use this if you want to specify a different table name. Default is 'session'.
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false,
-    sameSite: 'none', 
-  } // Note: the `secure` option requires an HTTPS connection
-}));
 
-app.get('/check-login-status', (req, res) => {
-  //console.log("Session : "+req.session+"::: User : "+req.session.user);
-  console.log("Session ID : "+req.sessionID);
-  console.log("Session : ", req.session);
-  console.log("User : ", req.session.user);
-  if (req.session && req.session.user) {
-    res.json({ loggedIn: true });
-  } else {
-    res.json({ loggedIn: false });
-  }
-});
-
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      console.error("Error while Logout:"+err);
-      res.status(500).json({ status: 'error', message: 'An error occurred during logout' });
-    } else {
-      res.redirect('/login');
-    }
-  });
-});
-//--------------------------------------------------------------//
 
 app.get("/",(req,res)=>{
   res.send("This is IMS Server root api");
@@ -91,21 +57,27 @@ app.get('/data', async (req, res) => {
     }
 });
 
+const util = require('util');
+const jwtVerify = util.promisify(jwt.verify);
+
 app.get('/products', async (req, res) => {
-  if (req.session && req.session.user) {
-    try {
-      const client = await pool.connect();
-      const productResult = await client.query('SELECT * FROM ims_schema.products');
-      const results = { 'results': (productResult) ? productResult.rows : null};
-      client.release();
-      console.log(results);
-      return res.json(results);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  else {
-    res.status(401).json({ error: 'Not authenticated' });
+  // const token = req.headers['authorization'];
+  // if (!token) {
+  //   return res.status(401).json({ error: 'Not authenticated' });
+  // }
+
+  try {
+    //const decoded = await jwtVerify(token, process.env.JWT_SECRET);
+    // User is authenticated
+    const client = await pool.connect();
+    const productResult = await client.query(`select product_id, product_name, supplier_name,price,supplier_id from ims_schema.inventory_stock,ims_schema.inventory where user_name='${user_name}' and ims_schema.inventory_stock.inventory_id=ims_schema.inventory.inventory_id;`);
+    const results = { 'results': (productResult) ? productResult.rows : null};
+    client.release();
+    console.log(results);
+    return res.json(results);
+  } catch (err) {
+    console.error(err);
+    return res.status(401).json({ error: 'Not authenticated' });
   }
 });
 
@@ -165,23 +137,18 @@ app.post('/login', async (req, res) => {
 
     if (userResult.rows.length > 0) {
       const user = userResult.rows[0];
+      user_name=user.user_name;
+      console.log("Server Response : User Found :: "+user_name);
       const match = await bcrypt.compare(password, user.hash_pwd);
       if (match) {
-        console.log("User:"+user.user_code+" logged in successfully");
-        req.session.user = user;  
-        req.session.save(err => {
-          if (err) {
-            console.error("Error while saving session:"+err);
-          } else {
-            res.json({status: 'success', message: 'Server Response : Authentication successful', session : req.session, user:req.session.user})
-            console.log("Server Response : Authentication successful")
-          }
-        });
-        
-        //res.json({ status: 'success', message: 'Server Response : Authentication successful', user: userResult.rows[0].message }); 
+        // User authenticated successfully
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+//          res.cookie('token', token, { httpOnly: true });
+
+        res.json({ status: 'success', message: 'Authentication successful', token });
       } else {
-        console.log("Server Response : Authentication Failed :: Incorrect Password");
-        res.status(401).json({ status: 'fail', message: 'Server Response : Authentication Failed :: Incorrect Password' });
+        // User authentication failed
+        res.status(401).json({ status: 'error', message: 'Authentication failed' });
       }
       
     } else {
@@ -194,6 +161,21 @@ app.post('/login', async (req, res) => {
   } finally {
     client?.release();
   }
+});
+
+app.get('/check-login-status', (req, res) => {
+  const token = req.headers['authorization'].split(' ')[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+    res.json({ loggedIn: true, user: user });
+  });
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.json({ status: 'success', message: 'Logged out successfully' });
 });
 
 //--------------------------------------------------------------//
