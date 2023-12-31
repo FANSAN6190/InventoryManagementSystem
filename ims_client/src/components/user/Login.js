@@ -30,19 +30,14 @@ function Login() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, phone, password }),
-      
+      credentials: "include", // Include credentials for CORS requests
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === "fail") {
-          //window.location.href = "/login";
-          console.log("Login Failed, try again");
-        } else if (data.token) {
-          localStorage.setItem('token', data.token);
+      .then((response) => {
+        if (response.status === 200) {
           setIsLoggedIn(true); // set isLoggedIn to true
-          //window.location.href = "/home";
+        } else {
+          console.log("Login Failed, try again");
         }
-        console.log("received :", data);
       })
       .catch((error) => {
         console.error("Error in Sending data to server:", error);
@@ -68,9 +63,9 @@ function Login() {
       navigate("/products");
     }
   }, [isLoggedIn, navigate]);
-  
+
   return (
-  <div
+    <div
       style={{
         display: "flex",
         justifyContent: "center",

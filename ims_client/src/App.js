@@ -15,16 +15,25 @@ function App() {
   useEffect(() => {
     // vercel web analytics and speed insights
     inject();
-  }, []); 
+  }, []);
+
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        console.log('User is logged in');
-      } else {
-        console.log('User is not logged in');
-      }
+      fetch("/check-login-status", {
+        method: "GET",
+        credentials: "include", // Include credentials for CORS requests
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.isAuthenticated) {
+            console.log("User is logged in");
+          } else {
+            console.log("User is not logged in");
+          }
+        })
+        .catch((error) => console.error("Error:", error));
     }, 3000); // Every 3 seconds
+    // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
 
