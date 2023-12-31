@@ -5,7 +5,7 @@ function UserTable() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch('https://localhost:5600/api/user')
+    fetch('http://localhost:5600/api/user')
       .then(response => response.json())
       .then(data => {
         setUsers(data);

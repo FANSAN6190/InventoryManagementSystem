@@ -5,6 +5,8 @@ const https = require('https');
 const fs = require('fs');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 
 // Database connection and credentials
 const { Pool } = require('pg');
@@ -27,11 +29,53 @@ const options = {
 const app=express();
 const server_port=process.env.SERVER_PORT || 8600;
 
-app.get("/",(req,res)=>{
-    res.send("This is IMS Server root api");
+//--------------------Session Handling-------------------------//
+app.use(session({
+  store: new pgSession({
+    pool: pool, // Use your existing PostgreSQL connection pool
+    tableName: "session" // Optional. Use this if you want to specify a different table name. Default is 'session'.
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    secure: false,
+    sameSite: 'none', 
+  } // Note: the `secure` option requires an HTTPS connection
+}));
+
+app.get('/check-login-status', (req, res) => {
+  //console.log("Session : "+req.session+"::: User : "+req.session.user);
+  console.log("Session ID : "+req.sessionID);
+  console.log("Session : ", req.session);
+  console.log("User : ", req.session.user);
+  if (req.session && req.session.user) {
+    res.json({ loggedIn: true });
+  } else {
+    res.json({ loggedIn: false });
+  }
 });
 
-app.use(cors());
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error("Error while Logout:"+err);
+      res.status(500).json({ status: 'error', message: 'An error occurred during logout' });
+    } else {
+      res.redirect('/login');
+    }
+  });
+});
+//--------------------------------------------------------------//
+
+app.get("/",(req,res)=>{
+  res.send("This is IMS Server root api");
+});
+
+app.use(cors({
+origin: 'http://localhost:5800', // replace with the domain of your client app
+credentials: true,
+}));
 
 app.get('/data', async (req, res) => {
     try {
@@ -48,6 +92,7 @@ app.get('/data', async (req, res) => {
 });
 
 app.get('/products', async (req, res) => {
+  if (req.session && req.session.user) {
     try {
       const client = await pool.connect();
       const productResult = await client.query('SELECT * FROM ims_schema.products');
@@ -58,6 +103,10 @@ app.get('/products', async (req, res) => {
     } catch (err) {
       console.error(err);
     }
+  }
+  else {
+    res.status(401).json({ error: 'Not authenticated' });
+  }
 });
 
 app.get('/suppliers', async (req, res) => {
@@ -118,8 +167,18 @@ app.post('/login', async (req, res) => {
       const user = userResult.rows[0];
       const match = await bcrypt.compare(password, user.hash_pwd);
       if (match) {
-        console.log("Server Response : Authentication successful")
-        res.json({ status: 'success', message: 'Server Response : Authentication successful', user: userResult.rows[0] }); 
+        console.log("User:"+user.user_code+" logged in successfully");
+        req.session.user = user;  
+        req.session.save(err => {
+          if (err) {
+            console.error("Error while saving session:"+err);
+          } else {
+            res.json({status: 'success', message: 'Server Response : Authentication successful', session : req.session, user:req.session.user})
+            console.log("Server Response : Authentication successful")
+          }
+        });
+        
+        //res.json({ status: 'success', message: 'Server Response : Authentication successful', user: userResult.rows[0].message }); 
       } else {
         console.log("Server Response : Authentication Failed :: Incorrect Password");
         res.status(401).json({ status: 'fail', message: 'Server Response : Authentication Failed :: Incorrect Password' });
@@ -136,14 +195,18 @@ app.post('/login', async (req, res) => {
     client?.release();
   }
 });
-//------------------------------------------------------------ -//
 
+//--------------------------------------------------------------//
 
 // Listening
-https.createServer(options, app).listen(server_port, () => {
-    console.log(`Server running at Port:${server_port}`);
-    const url = `https://localhost:${server_port}`;
-    console.log(`URL: ${url}`);
-  });
-
+// https.createServer(options, app).listen(server_port, () => {
+//     console.log(`Server running at Port:${server_port}`);
+//     const url = `https://localhost:${server_port}`;
+//     console.log(`URL: ${url}`);
+//   });
+app.listen(server_port, () => {
+  console.log(`Server running at Port:${server_port}`);
+  const url = `http://localhost:${server_port}`;
+  console.log(`URL: ${url}`);
+});
   

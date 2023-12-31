@@ -87,3 +87,4 @@ CREATE TABLE ims_schema.transactions(
         (supplier_order_id IS NULL)::integer = 1
     )
 );
+CREATE SEQUENCE ims_schema.user_code_seq START 1;

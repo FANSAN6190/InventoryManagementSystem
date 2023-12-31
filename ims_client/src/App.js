@@ -9,7 +9,6 @@ import MainContent from "./components/Main/MainContent";
 import ProductDetails from "./components/ProductDetails/ProductDetails";
 import SupplierDetails from "./components/suppliers/Suppliers";
 import Login from "./components/user/Login";
-import UserTable from "./imsdb";
 import Register from "./components/user/Register";
 
 function App() {
@@ -17,6 +16,25 @@ function App() {
     // vercel web analytics and speed insights
     inject();
   }, []);
+  
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetch('/check-login-status', {
+        credentials: 'include',
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.loggedIn) {
+            console.log('User is logged in : '+data.loggedIn);
+          } else {
+            console.log('User is not logged in : '+data.loggedIn);
+          }
+          console.log(data);
+        });
+    }, 3000);
+      return () => clearInterval(intervalId);
+  }, []); 
+
   return (
     <Router>
       <Main>
@@ -27,7 +45,6 @@ function App() {
           <Route path="/suppliers" element={<SupplierDetails />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/api/user" element={<UserTable />} />
         </Routes>
       </Main>
       <SpeedInsights />
