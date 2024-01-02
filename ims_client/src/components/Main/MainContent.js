@@ -1,9 +1,19 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import {checkLoginStatus} from "../user/withAuthCheck";
 
 function MainContent() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    checkLoginStatus().then((isAuthenticated) => {
+      if (isAuthenticated) {
+        document.getElementById("auth_div").style.display = "none";
+      }
+    });
+  }, []);
+
   return (
     <Fragment>
       <br></br>
@@ -23,25 +33,28 @@ function MainContent() {
         />
       </span>
       <h2>Manage your inventory with ease!</h2>
-      <h3>Get Started by Registering or Logging In!</h3>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="primary"
-          style={{ marginRight: "10px" }}
-          onClick={() => {
-            navigate("/login");
-          }}
-        >
-          Login
-        </Button>
-        <Button
-          variant="success"
-          onClick={() => {
-            navigate("/register");
-          }}
-        >
-          Register
-        </Button>
+
+      <div id="auth_div">
+        <h3>Get Started by Registering or Logging In!</h3>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="primary"
+            style={{ marginRight: "10px" }}
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Login
+          </Button>
+          <Button
+            variant="success"
+            onClick={() => {
+              navigate("/register");
+            }}
+          >
+            Register
+          </Button>
+        </div>
       </div>
     </Fragment>
   );

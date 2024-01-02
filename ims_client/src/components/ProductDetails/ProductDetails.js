@@ -6,15 +6,8 @@ function ProductDetails() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:5600/products`)
-    .then(response => {
-      if (response.status === 401) {
-        alert('You are not logged in. Please login!');
-        navigate('/login');
-      } else {
-        return response.json();
-      }
-    })
+    fetch(`http://localhost:5600/products`, { credentials: 'include' }) // Include credentials
+    .then(response => response.json())
     .then((data) => setProducts(data.results))
     .catch(error => {
       console.error('Error:', error);

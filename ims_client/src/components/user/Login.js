@@ -111,12 +111,7 @@ function Login() {
             required
           ></input>
         </div>
-
-        {/* <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="exampleCheck1"></input>
-            <label class="form-check-label" for="exampleCheck1">Check me out</label>
-          </div> */}
-
+        
         <button
           style={{ margin: "20px" }}
           type="submit"
