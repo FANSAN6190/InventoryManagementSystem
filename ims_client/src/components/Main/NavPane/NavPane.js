@@ -2,7 +2,10 @@
 
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, NavDropdown, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { checkLoginStatus } from "../../user/withAuthCheck";
+import { useEffect } from "react";
 
 const StyledNavLink = styled(Link)`
   border-radius: 10px;
@@ -54,34 +57,69 @@ const StyledDropdownItem = styled(NavDropdown.Item)`
   }
   background-color: white;
 `;
+
 function NavPane() {
-  // const [Navcontent, setNavContent] = useState("home");
-  // const [open, setOpen] = useState(true);
+  const navigate = useNavigate();
 
-  // const handleClick = (newNavContent) => {
-  //   setNavContent(newNavContent);
-  // };
-
-  // useEffect(() => {
-  //   console.log(Navcontent);
-  // }, [Navcontent]);
-
+  function logout() {
+    fetch("/logout", {
+      method: "POST",
+      credentials: "include", // include credentials to send the httpOnly cookie
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result === "success") {
+          console.log("Logged out successfully");
+          document.getElementById("logout").style.display = "none";
+          navigate("/login"); // redirect to login page
+        } else {
+          console.log("Logout failed");
+        }
+        console.log(data);
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+  useEffect(() => {
+    checkLoginStatus().then((isAuthenticated) => {
+      if (!isAuthenticated) {
+        document.getElementById("logout").style.display = "none";
+      }
+    });
+  }, []);
   return (
     <StyledNavbar collapseOnSelect expand="lg">
-      <Navbar.Brand href="/" style={{display: "flex"}}>
-        <img src={process.env.PUBLIC_URL + "/logo1.png"}
+      <Navbar.Brand href="/" style={{ display: "flex" }}>
+        <img
+          src={process.env.PUBLIC_URL + "/logo1.png"}
           width="60"
           height="60"
           className="d-inline-block align-top"
-          alt="My Website Logo"/>
-        <h4 className="text-muted" style={{marginTop:'15px', marginLeft:'10px'}}>Inventory Management System</h4>
+          alt="My Website Logo"
+        />
+        <h4
+          className="text-muted"
+          style={{ marginTop: "15px", marginLeft: "10px" }}
+        >
+          Inventory Management System
+        </h4>
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link as={StyledNavLink} to="/">Home</Nav.Link>
-          <Nav.Link as={StyledNavLink} to="/dashboard">Dashboard</Nav.Link>
-          <NavDropdown style={{marginTop:'5px', marginLeft:'10px'}} title="Others" id="collasible-nav-dropdown">
+          <Nav.Link as={StyledNavLink} to="/">
+            Home
+          </Nav.Link>
+          <Nav.Link as={StyledNavLink} to="/dashboard">
+            Dashboard
+          </Nav.Link>
+          <NavDropdown
+            style={{ marginTop: "5px", marginLeft: "10px" }}
+            title="Others"
+            id="collasible-nav-dropdown"
+          >
+            <StyledDropdownItem>
+              <Link to="/add_update_inventory">Register Inventory</Link>
+            </StyledDropdownItem>
             <StyledDropdownItem>
               <Link to="/products">Products</Link>
             </StyledDropdownItem>
@@ -92,6 +130,9 @@ function NavPane() {
               <Link to="/api/user">Orders</Link>
             </StyledDropdownItem>
           </NavDropdown>
+          <Button as={StyledNavLink} id="logout" onClick={logout}>
+            Logout
+          </Button>
         </Nav>
       </Navbar.Collapse>
     </StyledNavbar>
