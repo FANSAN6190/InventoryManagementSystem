@@ -18,7 +18,7 @@ CREATE TABLE ims_schema.inventory(
 	inventory_name VARCHAR(100),
 	user_name VARCHAR(20) NOT NULL REFERENCES ims_schema.users(user_name),
 	no_of_products INT DEFAULT 0,
-	product_catalogue JSONB,
+	product_catalogue JSONB DEFAULT '[]',
 	total_volume INT DEFAULT 0,
 	inventory_worth NUMERIC(10, 2) DEFAULT 0.00,
 	last_update TIMESTAMP,
@@ -32,7 +32,7 @@ CREATE TABLE ims_schema.suppliers(
 	phone_no VARCHAR(10) UNIQUE NOT NULL CHECK (phone_no ~ '^[0-9]{10}$'),
 	email  VARCHAR(50) UNIQUE CHECK (email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
 	no_of_products INT DEFAULT 0,
-	product_catalogue JSONB
+	product_catalogue JSONB DEFAULT '[]',
 ); 
 
 CREATE TABLE ims_schema.products(
@@ -40,7 +40,7 @@ CREATE TABLE ims_schema.products(
 	product_name VARCHAR NOT NULL,
 	price NUMERIC(10, 2),
 	supplier_id VARCHAR(10) REFERENCES ims_schema.suppliers(supplier_id),
-	product_details JSONB
+	other_details JSONB DEFAULT '[]'
 );
 
 CREATE TABLE ims_schema.inventory_stock(
