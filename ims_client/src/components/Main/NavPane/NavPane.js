@@ -118,7 +118,7 @@ function NavPane() {
             id="collasible-nav-dropdown"
           >
             <StyledDropdownItem>
-              <Link to="/add_update_inventory">Register Inventory</Link>
+              <Link to="/add_update_inventory">Add/Update Inventory</Link>
             </StyledDropdownItem>
             <StyledDropdownItem>
               <Link to="/products">Products</Link>

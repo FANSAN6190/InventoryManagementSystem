@@ -69,10 +69,25 @@ function RegisterUpdateInventory() {
     const [newInventoryName, setNewInventoryName] = useState('');
     const [newInventoryId, setNewInventoryId] = useState('');
     const [existingInventories, setExistingInventories] = useState([]);
+
     useEffect(() => {
-        setExistingInventories(['Inventory 1/1234', 'Inventory 2/5678', 'Inventory 3/9012']);
+        const fetchInventories = async () => {
+            try {
+                const response = await fetch("http://localhost:5600/get-inventories",
+                {
+                    method: "GET",
+                    headers: {"Content-Type": "application/json",},
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                setExistingInventories(data.results.map((inventory) => inventory.inventory_name+'/'+inventory.inventory_id));
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+        fetchInventories();
     }, []);
-    
+
     const getInputInJson = () => {
         const inputInJson = JSON.stringify({
             inventoryName: isCreatingNewInventory ? newInventoryName : inventoryNameId.split('/')[0],
@@ -87,6 +102,7 @@ function RegisterUpdateInventory() {
     const sendInventoryData = async (event) => {
         event.preventDefault();
         const AUdata=getInputInJson();
+        console.log(AUdata);
         if(AUdata==="" || (AUdata.inventoryName==="" && AUdata.inventoryId==="")){
             console.log("Please fill relevant details");
             return;
@@ -225,6 +241,24 @@ function RegisterUpdateInventory() {
 
 }
 function ProductForm({ product, index, updateProduct, deleteProduct, updateOtherDetails, deleteOtherDetails, addOtherDetails }) {
+    const [existingSuppliers, setExistingSuppliers] = useState([]);
+    useEffect(() => {
+        const fetchSuppliers = async () => {
+            try {
+                const response = await fetch("http://localhost:5600/get-suppliers",
+                {
+                    method: "GET",
+                    headers: {"Content-Type": "application/json",},
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                setExistingSuppliers(data.results.map((supplier) => supplier.supplier_name+'/'+supplier.supplier_id));
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+        fetchSuppliers();
+    }, []);
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' , backgroundColor:'#bef4f7', padding:'10px'}}>
@@ -298,7 +332,7 @@ function ProductForm({ product, index, updateProduct, deleteProduct, updateOther
                         required
                     >
                         <option value="">Select a supplier</option>
-                        {['a','b','c'].map((supplierId, supplierIndex) => (
+                        {existingSuppliers.map((supplierId, supplierIndex) => (
                             <option key={supplierIndex} value={supplierId}>
                                 {supplierId}
                             </option>
