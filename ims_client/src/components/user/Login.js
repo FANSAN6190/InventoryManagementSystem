@@ -23,7 +23,7 @@ function Login() {
   const navigate = useNavigate();
 
   const sendLoginData = useCallback(() => {
-    fetch("http://localhost:5600/login", {
+    fetch("/login", {
       // replace with your server's address and port
       method: "POST",
       headers: {
@@ -111,7 +111,7 @@ function Login() {
             required
           ></input>
         </div>
-        
+
         <button
           style={{ margin: "20px" }}
           type="submit"

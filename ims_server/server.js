@@ -23,23 +23,25 @@ const pool = new Pool({
 });
 
 // Loading SSL certificate and key
-const options = {
+/* const options = {
   key: fs.readFileSync("../key.pem"),
   cert: fs.readFileSync("../cert.pem"),
-};
+};*/
 
 //----------------------------Main------------------------------//
 const app = express();
-const server_port = process.env.SERVER_PORT || 8600;
+const server_port = process.env.PORT || 5600;
 
 app.get("/", (req, res) => {
+  console.log("ims server api");
   res.send("This is IMS Server root api");
+  console.log("ims server root api");
 });
 
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5800", // replace with the domain of your client app
+    origin: ["http://localhost:5800","https://inventory-management-system-gold.vercel.app"],
     credentials: true,
   })
 );
@@ -61,11 +63,13 @@ app.get("/data", async (req, res) => {
 app.get("/products", checkAuthenticated, async (req, res) => {
   try {
     const client = await pool.connect();
+    console.log(req.query.inventory);
     const productResult = await client.query(
       `select product_id, product_name, supplier_name,price,supplier_id 
       from ims_schema.users,ims_schema.inventory_stock,ims_schema.inventory 
-      where user_code='${req.user_code}'and ims_schema.users.user_name=ims_schema.inventory.user_name 
-      and ims_schema.inventory_stock.inventory_id=ims_schema.inventory.inventory_id;`
+      where user_code='${req.user_code}' and ims_schema.users.user_name=ims_schema.inventory.user_name 
+      and ims_schema.inventory_stock.inventory_id=ims_schema.inventory.inventory_id 
+      and ims_schema.inventory.inventory_id='${req.query.inventory}';`
     );
     const results = { results: productResult ? productResult.rows : null };
     client.release();
@@ -162,7 +166,7 @@ app.post("/add-update-inventory",checkAuthenticated, async (req, res) => {
     await client.query(updateInventoryQuery, [JSON.stringify(mergedProductCatalogue), mergedProductCatalogue.length, totalVolume, inventoryWorth, inventoryId]);
     
     // Insert new products into the products table
-    const insertProductQuery = `INSERT INTO ims_schema.products(product_id, product_name, price, supplier_id, product_details) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (product_id) DO NOTHING`;
+    const insertProductQuery = `INSERT INTO ims_schema.products(product_id, product_name, price, supplier_id, other_details) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (product_id) DO NOTHING`;
 
     productCatalogue.forEach(async product => {
       console.log((product));

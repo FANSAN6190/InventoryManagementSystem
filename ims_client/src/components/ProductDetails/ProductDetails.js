@@ -1,22 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function ProductDetails() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
+  const [existingInventories, setExistingInventories] = useState([]);
   useEffect(() => {
-    fetch(`http://localhost:5600/products`, { credentials: 'include' }) // Include credentials
-    .then(response => response.json())
-    .then((data) => setProducts(data.results))
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  }, [navigate]);
+    const fetchInventories = async () => {
+      try {
+        const response = await fetch("/get-inventories", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+        const data = await response.json();
+        setExistingInventories(
+          data.results.map((inventory) => inventory.inventory_id)
+        );
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchInventories();
+  }, []);
+
+  const [selectedInventory, setSelectedInventory] = useState("");
+  useEffect(() => {
+    if (selectedInventory !== "") {
+      fetch(`/products?inventory=${selectedInventory}`, {
+        credentials: "include",
+      })
+        .then((response) => response.json())
+        .then((data) => setProducts(data.results))
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+  }, [selectedInventory, navigate]);
 
   return (
     <div>
       <h1 className="mb-4">Product Details</h1>
+      <select
+        className="custom-select mb-4"
+        style={{
+          padding: "5px",
+          borderRadius: "10px",
+          display: "block",
+          fontSize: "20px",
+        }}
+        onChange={(e) => setSelectedInventory(e.target.value)}
+      >
+        {existingInventories.map((inventory, index) => (
+          <option key={index} value={inventory}>
+            {inventory}
+          </option>
+        ))}
+      </select>
       <table className="table">
         <thead>
           <tr>

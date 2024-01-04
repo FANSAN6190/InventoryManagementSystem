@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function UserTable() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5600/api/user')
-      .then(response => response.json())
-      .then(data => {
+    fetch("/api/user")
+      .then((response) => response.json())
+      .then((data) => {
         setUsers(data);
       });
   }, []);
@@ -17,25 +17,26 @@ function UserTable() {
         <tr>
           <th>User ID</th>
           <th>First Name</th>
-          <th>Middle Name</th>  
+          <th>Middle Name</th>
           <th>Last Name</th>
           <th>Email</th>
           <th>Phone</th>
           <th>DOB</th>
         </tr>
-      </thead> 
+      </thead>
       <tbody>
-      {Array.isArray(users) && users.map((user) => (
+        {Array.isArray(users) &&
+          users.map((user) => (
             <tr key={user.user_id}>
-            <td>{user.user_id}</td>
-            <td>{user.first_name}</td>
-            <td>{user.mid_name}</td>
-            <td>{user.last_name}</td>
-            <td>{user.email}</td>
-            <td>{user.phone}</td>
-            <td>{new Date(user.dob).toLocaleDateString()}</td>
-          </tr>
-        ))}
+              <td>{user.user_id}</td>
+              <td>{user.first_name}</td>
+              <td>{user.mid_name}</td>
+              <td>{user.last_name}</td>
+              <td>{user.email}</td>
+              <td>{user.phone}</td>
+              <td>{new Date(user.dob).toLocaleDateString()}</td>
+            </tr>
+          ))}
       </tbody>
     </table>
   );

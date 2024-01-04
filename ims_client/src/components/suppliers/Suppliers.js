@@ -4,7 +4,7 @@ function SupplierDetails() {
   const [suppliers, setSuppliers] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:5600/suppliers`)
+    fetch(`/suppliers`)
       .then((response) => response.json())
       .then((data) => setSuppliers(data.results));
   }, []);
