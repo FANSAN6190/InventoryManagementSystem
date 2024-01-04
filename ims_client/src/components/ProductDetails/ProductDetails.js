@@ -9,7 +9,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchInventories = async () => {
       try {
-        const response = await fetch("/get-inventories", {
+        const response = await fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/get-inventories", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

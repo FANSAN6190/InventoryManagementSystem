@@ -62,7 +62,7 @@ function NavPane() {
   const navigate = useNavigate();
 
   function logout() {
-    fetch("/logout", {
+    fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/logout", {
       method: "POST",
       credentials: "include", // include credentials to send the httpOnly cookie
     })

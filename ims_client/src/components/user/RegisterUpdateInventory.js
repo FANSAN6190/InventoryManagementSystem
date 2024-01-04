@@ -75,7 +75,7 @@ function RegisterUpdateInventory() {
   useEffect(() => {
     const fetchInventories = async () => {
       try {
-        const response = await fetch("/get-inventories", {
+        const response = await fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/get-inventories", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -123,7 +123,7 @@ function RegisterUpdateInventory() {
     try {
       console.log("AUdata");
       console.log(AUdata.inventoryName);
-      const response = await fetch("/add-update-inventory", {
+      const response = await fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/add-update-inventory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: AUdata,
@@ -267,7 +267,7 @@ function ProductForm({
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch("/get-suppliers", {
+        const response = await fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/get-suppliers", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

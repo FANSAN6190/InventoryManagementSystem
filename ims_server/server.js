@@ -293,9 +293,11 @@ app.post("/login", async (req, res) => {
 app.get("/check-login-status", (req, res) => {
   const token = req.cookies["token"];
   if (!token) {
+    console.log("No token found");
     return res.json({ isAuthenticated: false });
   }
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    console.log("Token found");
     if (err) {
       return res.json({ isAuthenticated: false });
     }
@@ -307,14 +309,17 @@ app.get("/check-login-status", (req, res) => {
 async function checkAuthenticated(req, res, next) {
   const token = req.cookies["token"];
   if (!token) {
+    console.log("No token found");
     return res.status(401).json({ message: "Not authenticated" });
   }
   try {
+    console.log("Token found");
     const user = await jwtVerify(token, process.env.JWT_SECRET);
     req.user_code = user.userCode; // Attach user_code to req object
 
     next();
   } catch (err) {
+    console.log(err);
     return res.status(401).json({ message: "Not authenticated" });
   }
 }

@@ -31,7 +31,7 @@ function App() {
   // need to be removed later
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch("/check-login-status", {
+      fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/check-login-status", {
         method: "GET",
         credentials: "include", // Include credentials for CORS requests
       })

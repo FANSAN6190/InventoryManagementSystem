@@ -23,7 +23,7 @@ function Login() {
   const navigate = useNavigate();
 
   const sendLoginData = useCallback(() => {
-    fetch("/login", {
+    fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/login", {
       // replace with your server's address and port
       method: "POST",
       headers: {

@@ -43,7 +43,7 @@ function Register() {
         console.log("passwords does not match");
       } else {
         // Send the registration data to the server
-        fetch("/register", {
+        fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

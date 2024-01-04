@@ -5,7 +5,7 @@ function UserTable() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch("/api/user")
+    fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/api/user")
       .then((response) => response.json())
       .then((data) => {
         setUsers(data);
