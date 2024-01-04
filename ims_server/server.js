@@ -23,14 +23,14 @@ const pool = new Pool({
 });
 
 // Loading SSL certificate and key
-const options = {
+/* const options = {
   key: fs.readFileSync("../key.pem"),
   cert: fs.readFileSync("../cert.pem"),
-};
+};*/
 
 //----------------------------Main------------------------------//
 const app = express();
-const server_port = process.env.SERVER_PORT || 8080;
+const server_port = process.env.PORT || 5600;
 
 app.get("/", (req, res) => {
   console.log("ims server api");
@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5800", // replace with the domain of your client app
+    origin: ["http://localhost:5800","https://inventory-management-system-gold.vercel.app"],
     credentials: true,
   })
 );

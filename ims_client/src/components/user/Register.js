@@ -43,7 +43,7 @@ function Register() {
         console.log("passwords does not match");
       } else {
         // Send the registration data to the server
-        fetch("http://localhost:5600/register", {
+        fetch("/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
