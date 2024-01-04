@@ -32,12 +32,13 @@ CREATE TABLE ims_schema.suppliers(
 	phone_no VARCHAR(10) UNIQUE NOT NULL CHECK (phone_no ~ '^[0-9]{10}$'),
 	email  VARCHAR(50) UNIQUE CHECK (email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
 	no_of_products INT DEFAULT 0,
-	product_catalogue JSONB DEFAULT '[]',
+	product_catalogue JSONB DEFAULT '[]'
 ); 
 
 CREATE TABLE ims_schema.products(
 	product_id VARCHAR(15) PRIMARY KEY,
 	product_name VARCHAR NOT NULL,
+	brand VARCHAR,
 	price NUMERIC(10, 2),
 	supplier_id VARCHAR(10) REFERENCES ims_schema.suppliers(supplier_id),
 	other_details JSONB DEFAULT '[]'
@@ -87,4 +88,60 @@ CREATE TABLE ims_schema.transactions(
         (supplier_order_id IS NULL)::integer = 1
     )
 );
+
+CREATE OR REPLACE FUNCTION update_inventory() RETURNS TRIGGER AS $$
+BEGIN
+  -- Update the 'no_of_products' field in the 'inventory' table
+  UPDATE ims_schema.inventory
+  SET no_of_products = (
+    SELECT SUM(current_quantity)
+    FROM ims_schema.inventory_stock
+    WHERE inventory_id = NEW.inventory_id
+  )
+  WHERE inventory_id = NEW.inventory_id;
+
+  -- Update the 'inventory_worth' field in the 'inventory' table
+  UPDATE ims_schema.inventory
+  SET inventory_worth = (
+    SELECT SUM(price * current_quantity)
+    FROM ims_schema.inventory_stock
+    WHERE inventory_id = NEW.inventory_id
+  )
+  WHERE inventory_id = NEW.inventory_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_inventory_trigger
+AFTER INSERT OR UPDATE ON ims_schema.inventory_stock
+FOR EACH ROW EXECUTE PROCEDURE update_inventory();
+	
 CREATE SEQUENCE ims_schema.user_code_seq START 1;
+
+----------LOG Management Table----------
+CREATE TABLE ims_schema.log_table(
+    log_id SERIAL PRIMARY KEY,
+    table_name VARCHAR(50) NOT NULL,
+    operation VARCHAR(10) NOT NULL,
+    operation_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    old_data JSONB,
+    new_data JSONB
+);
+CREATE OR REPLACE FUNCTION log_inventory_operation() RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO ims_schema.log_table(table_name, operation, old_data, new_data)
+  VALUES (
+    'inventory',
+    TG_OP,
+    row_to_json(OLD),
+    row_to_json(NEW)
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER log_inventory_operation_trigger
+AFTER INSERT OR UPDATE OR DELETE ON ims_schema.inventory
+FOR EACH ROW EXECUTE PROCEDURE log_inventory_operation();

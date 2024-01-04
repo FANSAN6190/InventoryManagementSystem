@@ -68,8 +68,8 @@ function RegisterUpdateInventory() {
     const [isCreatingNewInventory, setIsCreatingNewInventory] = useState(false);
     const [newInventoryName, setNewInventoryName] = useState('');
     const [newInventoryId, setNewInventoryId] = useState('');
+    
     const [existingInventories, setExistingInventories] = useState([]);
-
     useEffect(() => {
         const fetchInventories = async () => {
             try {

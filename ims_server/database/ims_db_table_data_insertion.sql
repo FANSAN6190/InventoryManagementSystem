@@ -1,15 +1,14 @@
 -- Insert data into users
 INSERT INTO ims_schema.users(user_code, user_name, full_name, dob, email, country_code, phone_no, hash_pwd)
 VALUES 
-('U0001', 'username1', 'User One', '1980-01-01', 'user1@example.com', '+1', '1234567890', 'pass1'),
-('U0002', 'username2', 'User Two', '1985-02-02', 'user2@example.com', '+1', '2345678901', 'pass2');
-
+('fans20870001', 'fansan6190', 'Fanindra Saini', '2003-09-06', 'fanin.s.pbl@gmail.com', '+91', '7974362087', '$2b$10$lwTpS1g9cnNr/1PSDX0GN.FNdbGqhQ2.1JFiONGBomCp8IZrEdLXy'),
+('arun32110002','arunkumar','Arun Kumar','2000-02-05','arunkumar@gmail.com','+91','8906543211','$2b$10$HsHhrmGKwaPKg8aI35e./.llExPJVa7PTY6ueqwY6DqOmwy/lnV9m');
 
 -- Insert data into inventory
 INSERT INTO ims_schema.inventory(inventory_code, inventory_id, inventory_name, user_name)
 VALUES 
-('I101', 'INV101', 'Inventory One', 'username1'),
-('I102', 'INV102', 'Inventory Two', 'username2');
+('I101', 'INV101', 'Inventory One', 'fansan6190'),
+('I102', 'INV102', 'Inventory Two', 'arunkumar');
 
 
 -- Insert data into suppliers
@@ -109,8 +108,8 @@ SELECT
         ELSE NULL
     END,
     CASE 
-        WHEN s.i % 2 = 0 THEN 'username1'
-        ELSE 'username2'
+        WHEN s.i % 2 = 0 THEN 'fansan6190'
+        ELSE 'arunkumar'
     END,
     CASE 
         WHEN s.i % 4 = 0 THEN 'credit'
