@@ -24,9 +24,9 @@ const pool = new Pool({
 
 // Loading SSL certificate and key
 /* const options = {
-  key: fs.readFileSync("../key.pem"),
-  cert: fs.readFileSync("../cert.pem"),
-};*/
+  key: fs.readFileSync("./key.pem"),
+  cert: fs.readFileSync("./cert.pem"),
+}; */
 
 //----------------------------Main------------------------------//
 const app = express();
@@ -259,7 +259,7 @@ app.post("/login", async (req, res) => {
             expiresIn: "1h",
           }
         );
-        res.cookie("token", token, { httpOnly: true });
+        res.cookie("token", token, { httpOnly: true, sameSite: "none" });
 
         res.json({
           status: "success",
@@ -338,12 +338,12 @@ app.post("/logout", (req, res) => {
 });
 //===============================================================================//
 
-// Listening
+// //Listening
 // https.createServer(options, app).listen(server_port, () => {
 //     console.log(`Server running at Port:${server_port}`);
 //     const url = `https://localhost:${server_port}`;
 //     console.log(`URL: ${url}`);
-//   });
+// });
 app.listen(server_port, () => {
   console.log(`Server running at Port:${server_port}`);
   const url = `http://localhost:${server_port}`;

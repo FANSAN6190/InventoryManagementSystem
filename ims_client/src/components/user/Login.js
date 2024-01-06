@@ -60,7 +60,8 @@ function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/products");
+      console.log("Login Success");
+      navigate("/");
     }
   }, [isLoggedIn, navigate]);
 
