@@ -39,10 +39,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5800","https://localhost:5800",
-    "https://inventory-management-system-gold.vercel.app",
-    "https://www.stockspheretrack.live/",
-    "https://inventory-handling.d2ml9helmogfuu.amplifyapp.com	"],
+    origin: ["http://localhost:5800",
+             "https://localhost:5800",
+             "https://inventory-management-system-gold.vercel.app",
+             "https://www.stockspheretrack.live",
+             "https://inventory-handling.d2ml9helmogfuu.amplifyapp.com"],
     credentials: true,
     sameSite: "none",
   })
