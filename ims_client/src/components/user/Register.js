@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/bootstrap.css";
+import { SERVER_URL } from "../../config";
 
 function Register() {
   const [userName, setUserName] = useState("");
@@ -43,7 +44,7 @@ function Register() {
         console.log("passwords does not match");
       } else {
         // Send the registration data to the server
-        fetch("/register", {
+        fetch(`${SERVER_URL}/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "../../config";
 
 function checkLoginStatus() {
-  return fetch("/check-login-status", { method: "GET", credentials: "include" })
+  return fetch(`${SERVER_URL}/check-login-status`, { method: "GET", credentials: "include" })
     .then((response) => response.json())
     .then((data) => {
+      console.log("User is authenticated:", data.isAuthenticated);
       return data.isAuthenticated;
     })
     .catch((error) => console.error("Error:", error));

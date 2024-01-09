@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "../../config";
 
 function Login() {
   const formStyle = {
@@ -23,7 +24,7 @@ function Login() {
   const navigate = useNavigate();
 
   const sendLoginData = useCallback(() => {
-    fetch("/login", {
+    fetch(`${SERVER_URL}/login`, {
       // replace with your server's address and port
       method: "POST",
       headers: {
@@ -60,7 +61,8 @@ function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/products");
+      console.log("Login Success");
+      window.location.href = `/`;
     }
   }, [isLoggedIn, navigate]);
 

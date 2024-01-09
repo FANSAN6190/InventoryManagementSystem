@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { SERVER_URL } from "../../config";
 
 function SupplierDetails() {
   const [suppliers, setSuppliers] = useState([]);
 
   useEffect(() => {
-    fetch(`/suppliers`)
+    fetch(`${SERVER_URL}/suppliers`)
       .then((response) => response.json())
       .then((data) => setSuppliers(data.results));
   }, []);
