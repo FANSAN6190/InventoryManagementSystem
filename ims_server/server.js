@@ -33,16 +33,18 @@ const app = express();
 const server_port = process.env.PORT || 5600;
 
 app.get("/", (req, res) => {
-  console.log("ims server api");
-  res.send("This is IMS Server root api");
-  console.log("ims server root api");
+    res.send("This is IMS Server root api");
 });
-
+app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5800","https://inventory-management-system-gold.vercel.app"],
+    origin: ["http://localhost:5800","https://localhost:5800",
+    "https://inventory-management-system-gold.vercel.app",
+    "https://www.stockspheretrack.live/",
+    "https://inventory-handling.d2ml9helmogfuu.amplifyapp.com	"],
     credentials: true,
+    sameSite: "none",
   })
 );
 
@@ -95,9 +97,8 @@ app.get("/suppliers", async (req, res) => {
     console.error(err);
   }
 });
-app.use(express.json());
+
 //=======================Inventory Handling=========================//
-///get-inventories
 app.get("/get-inventories", checkAuthenticated, async (req, res) => {
   try {
     const client = await pool.connect();
@@ -259,7 +260,7 @@ app.post("/login", async (req, res) => {
             expiresIn: "1h",
           }
         );
-        res.cookie("token", token, { httpOnly: true, sameSite: "none" });
+        res.cookie("token", token, { httpOnly: true});
 
         res.json({
           status: "success",
@@ -291,16 +292,18 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/check-login-status", (req, res) => {
+  console.log("CLS: Checking login status");
   const token = req.cookies["token"];
   if (!token) {
-    console.log("No token found");
+    console.log("CLS: No token found");
     return res.json({ isAuthenticated: false });
   }
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    console.log("Token found");
     if (err) {
+      console.log("CLS: Invalid token");
       return res.json({ isAuthenticated: false });
     }
+    console.log("CLS: Valid token");
     res.json({ isAuthenticated: true, user: user });
   });
 });
@@ -309,16 +312,16 @@ app.get("/check-login-status", (req, res) => {
 async function checkAuthenticated(req, res, next) {
   const token = req.cookies["token"];
   if (!token) {
-    console.log("No token found");
+    console.log("CA: No token found");
     return res.status(401).json({ message: "Not authenticated" });
   }
   try {
-    console.log("Token found");
+    console.log("CA: Token found");
     const user = await jwtVerify(token, process.env.JWT_SECRET);
     req.user_code = user.userCode; // Attach user_code to req object
-
     next();
   } catch (err) {
+    console.log("CA: Invalid token");
     console.log(err);
     return res.status(401).json({ message: "Not authenticated" });
   }
@@ -338,7 +341,7 @@ app.post("/logout", (req, res) => {
 });
 //===============================================================================//
 
-// //Listening
+//Listening
 // https.createServer(options, app).listen(server_port, () => {
 //     console.log(`Server running at Port:${server_port}`);
 //     const url = `https://localhost:${server_port}`;

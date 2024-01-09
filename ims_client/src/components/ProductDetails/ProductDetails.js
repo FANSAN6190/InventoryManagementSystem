@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "../../config";
 
 function ProductDetails() {
   const [products, setProducts] = useState([]);
@@ -9,7 +10,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchInventories = async () => {
       try {
-        const response = await fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/get-inventories", {
+        const response = await fetch(`${SERVER_URL}/get-inventories`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -28,7 +29,7 @@ function ProductDetails() {
   const [selectedInventory, setSelectedInventory] = useState("");
   useEffect(() => {
     if (selectedInventory !== "") {
-      fetch(`/products?inventory=${selectedInventory}`, {
+      fetch(`${SERVER_URL}/products?inventory=${selectedInventory}`, {
         credentials: "include",
       })
         .then((response) => response.json())

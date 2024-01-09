@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { SERVER_URL } from "./config";
 
 function UserTable() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/api/user")
+    fetch(`${SERVER_URL}/api/user`)
       .then((response) => response.json())
       .then((data) => {
         setUsers(data);

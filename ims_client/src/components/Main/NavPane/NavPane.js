@@ -3,9 +3,9 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { checkLoginStatus } from "../../user/withAuthCheck";
 import { useEffect } from "react";
+import { SERVER_URL } from "../../../config";
 
 const StyledNavLink = styled(Link)`
   border-radius: 10px;
@@ -59,10 +59,8 @@ const StyledDropdownItem = styled(NavDropdown.Item)`
 `;
 
 function NavPane() {
-  const navigate = useNavigate();
-
   function logout() {
-    fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/logout", {
+    fetch(`${SERVER_URL}/logout`, {
       method: "POST",
       credentials: "include", // include credentials to send the httpOnly cookie
     })
@@ -71,7 +69,7 @@ function NavPane() {
         if (data.result === "success") {
           console.log("Logged out successfully");
           document.getElementById("logout").style.display = "none";
-          navigate("/login"); // redirect to login page
+          window.location.reload();
         } else {
           console.log("Logout failed");
         }

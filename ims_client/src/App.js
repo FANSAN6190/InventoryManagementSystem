@@ -11,14 +11,17 @@ import SupplierDetails from "./components/suppliers/Suppliers";
 import Login from "./components/user/Login";
 import Register from "./components/user/Register";
 
-import withAuthCheck from './components/user/withAuthCheck';
+import withAuthCheck from "./components/user/withAuthCheck";
 import RegisterUpdateInventory from "./components/user/RegisterUpdateInventory";
+import { SERVER_URL } from "./config";
 
-
-const ProductDetailsWithAuthCheck= withAuthCheck(ProductDetails, true );
-const SupplierDetailsWithAuthCheck= withAuthCheck(SupplierDetails, true );
-const DashboardWithAuthCheck= withAuthCheck(Dashboard, true );
-const RegisterUpdateInventoryWithAuthCheck= withAuthCheck(RegisterUpdateInventory, true );
+const ProductDetailsWithAuthCheck = withAuthCheck(ProductDetails, true);
+const SupplierDetailsWithAuthCheck = withAuthCheck(SupplierDetails, true);
+const DashboardWithAuthCheck = withAuthCheck(Dashboard, true);
+const RegisterUpdateInventoryWithAuthCheck = withAuthCheck(
+  RegisterUpdateInventory,
+  true
+);
 
 function App() {
   useEffect(() => {
@@ -26,12 +29,10 @@ function App() {
     inject();
   }, []);
 
-
-
   // need to be removed later
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch("http://ims-server-dev.ap-south-1.elasticbeanstalk.com/check-login-status", {
+      fetch(`${SERVER_URL}/check-login-status`, {
         method: "GET",
         credentials: "include", // Include credentials for CORS requests
       })
@@ -54,11 +55,14 @@ function App() {
         <Routes>
           <Route path="/" element={<MainContent />} />
           <Route path="/dashboard" element={<DashboardWithAuthCheck />} />
-          <Route path="/products" element={<ProductDetailsWithAuthCheck />}/>
+          <Route path="/products" element={<ProductDetailsWithAuthCheck />} />
           <Route path="/suppliers" element={<SupplierDetailsWithAuthCheck />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/add_update_inventory" element={<RegisterUpdateInventoryWithAuthCheck />} />
+          <Route
+            path="/add_update_inventory"
+            element={<RegisterUpdateInventoryWithAuthCheck />}
+          />
         </Routes>
       </Main>
       <SpeedInsights />
