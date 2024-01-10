@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const pgp = require('pg-promise')();
+const pgp = require("pg-promise")();
 
 const pgSession = require("connect-pg-simple")(session);
 const https = require("https");
@@ -33,17 +33,19 @@ const app = express();
 const server_port = process.env.PORT || 5600;
 
 app.get("/", (req, res) => {
-    res.send("This is IMS Server root api");
+  res.send("This is IMS Server root api");
 });
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5800",
-             "https://localhost:5800",
-             "https://inventory-management-system-gold.vercel.app",
-             "https://www.stockspheretrack.live",
-             "https://inventory-handling.d2ml9helmogfuu.amplifyapp.com"],
+    origin: [
+      "http://localhost:5800",
+      "https://localhost:5800",
+      "https://inventory-management-system-gold.vercel.app",
+      "https://www.stockspheretrack.live",
+      "https://inventory-handling.d2ml9helmogfuu.amplifyapp.com",
+    ],
     credentials: true,
     sameSite: "none",
   })
@@ -130,73 +132,110 @@ app.get("/get-suppliers", checkAuthenticated, async (req, res) => {
   }
 });
 
-app.post("/add-update-inventory",checkAuthenticated, async (req, res) => {
-  try{
+app.post("/add-update-inventory", checkAuthenticated, async (req, res) => {
+  try {
     const client = await pool.connect();
-    const { inventoryId, inventoryName, productCatalogue, isCreatingNewInventory} = req.body;
+    const {
+      inventoryId,
+      inventoryName,
+      productCatalogue,
+      isCreatingNewInventory,
+    } = req.body;
 
     //console.log(JSON.stringify(productCatalogue,null,2));
-    const userCode=req.user_code;
-    const userName=(await client.query(`SELECT user_name FROM ims_schema.users WHERE user_code='${userCode}';`)).rows[0].user_name;
-    
-    if(isCreatingNewInventory){
-      const insertNewInventoryQuery=`INSERT INTO ims_schema.inventory(inventory_code,inventory_id,inventory_name,user_name) 
+    const userCode = req.user_code;
+    const userName = (
+      await client.query(
+        `SELECT user_name FROM ims_schema.users WHERE user_code='${userCode}';`
+      )
+    ).rows[0].user_name;
+
+    if (isCreatingNewInventory) {
+      const insertNewInventoryQuery = `INSERT INTO ims_schema.inventory(inventory_code,inventory_id,inventory_name,user_name) 
       VALUES ($1,$2,$3,$4)`;
-      await client.query(insertNewInventoryQuery,[inventoryId,inventoryId,inventoryName,userName]);
+      await client.query(insertNewInventoryQuery, [
+        inventoryId,
+        inventoryId,
+        inventoryName,
+        userName,
+      ]);
     }
-    
+
     // Fetch the existing product catalogue
     const existingProductCatalogueQuery = `SELECT product_catalogue FROM ims_schema.inventory WHERE inventory_id=$1`;
-    const existingProductCatalogueResult = await client.query(existingProductCatalogueQuery, [inventoryId]);
-    let existingProductCatalogue = existingProductCatalogueResult.rows[0].product_catalogue;
-    if(existingProductCatalogue==null){
-      existingProductCatalogue=[];
+    const existingProductCatalogueResult = await client.query(
+      existingProductCatalogueQuery,
+      [inventoryId]
+    );
+    let existingProductCatalogue =
+      existingProductCatalogueResult.rows[0].product_catalogue;
+    if (existingProductCatalogue == null) {
+      existingProductCatalogue = [];
     }
     let totalVolume = 0;
     let inventoryWorth = 0;
-    let mergedProductCatalogue=[];
-    if(existingProductCatalogue.length+productCatalogue.length > 0){
+    let mergedProductCatalogue = [];
+    if (existingProductCatalogue.length + productCatalogue.length > 0) {
       // Merge the existing product catalogue with the new product catalogue
-      mergedProductCatalogue = [...existingProductCatalogue, ...productCatalogue];      
-      mergedProductCatalogue.forEach(product => {
+      mergedProductCatalogue = [
+        ...existingProductCatalogue,
+        ...productCatalogue,
+      ];
+      mergedProductCatalogue.forEach((product) => {
         totalVolume += parseInt(product.quantity);
         inventoryWorth += parseInt(product.quantity) * parseInt(product.price);
       });
     }
     // Update the inventory with the total volume and inventory worth
     const updateInventoryQuery = `UPDATE ims_schema.inventory SET product_catalogue=$1, no_of_products=$2, total_volume=$3, inventory_worth=$4, last_update=CURRENT_TIMESTAMP  WHERE inventory_id=$5`;
-    await client.query(updateInventoryQuery, [JSON.stringify(mergedProductCatalogue), mergedProductCatalogue.length, totalVolume, inventoryWorth, inventoryId]);
-    
+    await client.query(updateInventoryQuery, [
+      JSON.stringify(mergedProductCatalogue),
+      mergedProductCatalogue.length,
+      totalVolume,
+      inventoryWorth,
+      inventoryId,
+    ]);
+
     // Insert new products into the products table
     const insertProductQuery = `INSERT INTO ims_schema.products(product_id, product_name, price, supplier_id, other_details) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (product_id) DO NOTHING`;
 
-    productCatalogue.forEach(async product => {
-      console.log((product));
+    productCatalogue.forEach(async (product) => {
+      console.log(product);
       const product_id = product.productId;
       const product_name = product.productName;
       const price = product.price;
-      const supplier_id = (product.supplier).split("/")[1];
-      const otherDetails = product.otherDetails; 
+      const supplier_id = product.supplier.split("/")[1];
+      const otherDetails = product.otherDetails;
       console.log(product_id, product_name, price, supplier_id, otherDetails);
-      await client.query(insertProductQuery, [product_id, product_name, price, supplier_id, JSON.stringify(otherDetails)]);
+      await client.query(insertProductQuery, [
+        product_id,
+        product_name,
+        price,
+        supplier_id,
+        JSON.stringify(otherDetails),
+      ]);
     });
-
-  }catch(err){
+  } catch (err) {
     console.error(err);
   }
-  
 });
 
-
 //==================================================================//
-
 
 //=======================Authentication Handling=========================//
 
 const jwtVerify = util.promisify(jwt.verify);
 app.post("/register", async (req, res) => {
   const {
-    userName, fullName, dob, email, countryCode, phoneNo, password, confirmPass} = req.body;
+    userName,
+    fullName,
+    dob,
+    email,
+    countryCode,
+    phoneNo,
+    password,
+    confirmPass,
+  } = req.body;
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -217,7 +256,16 @@ app.post("/register", async (req, res) => {
       INSERT INTO ims_schema.users(user_code, user_name, full_name, dob, email, country_code, phone_no, hash_pwd)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `;
-    const values = [userCode, userName, fullName, dob, email, countryCode, phoneNo, hashedPassword];
+    const values = [
+      userCode,
+      userName,
+      fullName,
+      dob,
+      email,
+      countryCode,
+      phoneNo,
+      hashedPassword,
+    ];
     console.log(values);
     await client.query(insertUserQuery, values);
 
@@ -261,7 +309,7 @@ app.post("/login", async (req, res) => {
             expiresIn: "1h",
           }
         );
-        res.cookie("token", token, { httpOnly: true});
+        res.cookie("token", token, { httpOnly: true });
 
         res.json({
           status: "success",
