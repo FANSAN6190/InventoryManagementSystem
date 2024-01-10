@@ -66,16 +66,19 @@ app.get("/data", async (req, res) => {
 app.get("/products", checkAuthenticated, async (req, res) => {
   try {
     const client = await pool.connect();
-    console.log(req.query.inventory);
     const productResult = await client.query(
-      `select product_id, product_name, supplier_name,price,supplier_id 
-      from ims_schema.users,ims_schema.inventory_stock,ims_schema.inventory 
-      where user_code='${req.user_code}' and ims_schema.users.user_name=ims_schema.inventory.user_name 
-      and ims_schema.inventory_stock.inventory_id=ims_schema.inventory.inventory_id 
-      and ims_schema.inventory.inventory_id='${req.query.inventory}';`
+      `select p.product_id, p.product_name, p.price, p.supplier_id 
+      from ims_schema.users u, ims_schema.inventory i, ims_schema.products p,
+      jsonb_array_elements(i.product_catalogue) as pc
+      where u.user_code=$1 
+      and u.user_name=i.user_name 
+      and p.product_id=pc->>'productId'
+      and i.inventory_id=$2`,
+      [req.user_code, req.query.inventory]
     );
     const results = { results: productResult ? productResult.rows : null };
     client.release();
+    console.log("product: ");
     console.log(results);
     return res.json(results);
   } catch (err) {

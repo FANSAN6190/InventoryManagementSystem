@@ -7,6 +7,8 @@ function ProductDetails() {
   const navigate = useNavigate();
 
   const [existingInventories, setExistingInventories] = useState([]);
+  const [selectedInventory, setSelectedInventory] = useState("");
+  
   useEffect(() => {
     const fetchInventories = async () => {
       try {
@@ -16,9 +18,11 @@ function ProductDetails() {
           credentials: "include",
         });
         const data = await response.json();
-        setExistingInventories(
-          data.results.map((inventory) => inventory.inventory_id)
-        );
+        const inventories = data.results.map((inventory) => inventory.inventory_id);
+        setExistingInventories(inventories);
+        if (inventories.length > 0) {
+          setSelectedInventory(inventories[0]);
+        }
       } catch (error) {
         console.error("Error:", error);
       }
@@ -26,9 +30,9 @@ function ProductDetails() {
     fetchInventories();
   }, []);
 
-  const [selectedInventory, setSelectedInventory] = useState("");
+
   useEffect(() => {
-    if (selectedInventory !== "") {
+    if (selectedInventory) {
       fetch(`${SERVER_URL}/products?inventory=${selectedInventory}`, {
         credentials: "include",
       })
