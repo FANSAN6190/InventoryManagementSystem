@@ -63,6 +63,7 @@ function Register() {
           .then((response) => response.json())
           .then((data) => {
             console.log("Successfully Registered:", data);
+            alert("Account Registered Succesfully");
             window.alert("Successfully Registered, Go to Login Page");
             setTimeout(() => {
               //navigate('/login');
