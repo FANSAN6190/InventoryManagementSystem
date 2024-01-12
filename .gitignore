@@ -28,5 +28,7 @@ yarn-error.log*
 ims_client/node_modules/.cache/default-development/
 ims_client/node_modules/.cache/
 node_modules/.cache/
+node_modules/
 .cache/
 .vercel
+.vscode

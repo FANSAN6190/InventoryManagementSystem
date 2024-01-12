@@ -1,6 +1,3 @@
-import { SpeedInsights } from "@vercel/speed-insights/react";
-import { inject } from "@vercel/analytics";
-
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Main from "./components/Main/Main";
@@ -24,10 +21,6 @@ const RegisterUpdateInventoryWithAuthCheck = withAuthCheck(
 );
 
 function App() {
-  useEffect(() => {
-    // vercel web analytics and speed insights
-    inject();
-  }, []);
 
   // need to be removed later
   useEffect(() => {
@@ -65,7 +58,6 @@ function App() {
           />
         </Routes>
       </Main>
-      <SpeedInsights />
     </Router>
   );
 }
