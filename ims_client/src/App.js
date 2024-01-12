@@ -7,13 +7,14 @@ import ProductDetails from "./components/ProductDetails/ProductDetails";
 import SupplierDetails from "./components/suppliers/Suppliers";
 import Login from "./components/user/Login";
 import Register from "./components/user/Register";
-
+import InventoryStatus from "./components/InventoryStatus/InventoryStatus";
 import withAuthCheck from "./components/user/withAuthCheck";
 import RegisterUpdateInventory from "./components/user/RegisterUpdateInventory";
 import { SERVER_URL } from "./config";
 
 const ProductDetailsWithAuthCheck = withAuthCheck(ProductDetails, true);
 const SupplierDetailsWithAuthCheck = withAuthCheck(SupplierDetails, true);
+const InventoryStatusWithAuthCheck = withAuthCheck(InventoryStatus, true);
 const DashboardWithAuthCheck = withAuthCheck(Dashboard, true);
 const RegisterUpdateInventoryWithAuthCheck = withAuthCheck(
   RegisterUpdateInventory,
@@ -50,6 +51,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardWithAuthCheck />} />
           <Route path="/products" element={<ProductDetailsWithAuthCheck />} />
           <Route path="/suppliers" element={<SupplierDetailsWithAuthCheck />} />
+          <Route path="/inventory_status" element={<InventoryStatusWithAuthCheck />}/>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route

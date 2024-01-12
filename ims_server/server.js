@@ -6,6 +6,7 @@ const session = require("express-session");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const pgp = require("pg-promise")();
+const socketIo = require('socket.io');
 
 const pgSession = require("connect-pg-simple")(session);
 const https = require("https");
@@ -27,10 +28,13 @@ const pool = new Pool({
   key: fs.readFileSync("./key.pem"),
   cert: fs.readFileSync("./cert.pem"),
 }; */
-
 //----------------------------Main------------------------------//
 const app = express();
 const server_port = process.env.PORT || 5600;
+
+const server = require('https').createServer(app);
+const io = socketIo(server);
+
 
 app.get("/", (req, res) => {
   res.send("This is IMS Server root api");
@@ -221,8 +225,23 @@ app.post("/add-update-inventory", checkAuthenticated, async (req, res) => {
   } catch (err) {
     console.error(err);
   }
+  updateInventory(req,res);
 });
 
+let inventory = [];
+function updateInventory(req,res) {
+  inventory= async ()=>{
+    const client = await pool.connect();
+    const inventoryResult = await client.query(
+      `SELECT inventory_name,inventory_id,no_of_products, total_volume, product_catalogue FROM ims_schema.inventory,ims_schema.users WHERE ims_schema.users.user_code='${req.user_code}' and ims_schema.users.user_name=ims_schema.inventory.user_name;`
+    );
+    const results = { results: inventoryResult ? inventoryResult.rows : null };
+    client.release();
+    console.log(results);
+    return res.json(results);
+  }
+  io.emit("inventory update", inventory);
+}
 //==================================================================//
 
 //=======================Authentication Handling=========================//
