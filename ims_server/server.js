@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import pgPromise from "pg-promise";
 
+
 import connectPgSimple from "connect-pg-simple";
 import https from "https";
 import fs from "fs";
@@ -33,10 +34,13 @@ const pool = new Pool({
   key: fs.readFileSync("./key.pem"),
   cert: fs.readFileSync("./cert.pem"),
 }; */
-
 //----------------------------Main------------------------------//
 const app = express();
 const server_port = process.env.PORT || 5600;
+
+const server = require('https').createServer(app);
+const io = socketIo(server);
+
 
 app.get("/", (req, res) => {
   res.send("This is IMS Server root api");
