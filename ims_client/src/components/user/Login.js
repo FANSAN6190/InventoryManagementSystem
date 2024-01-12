@@ -61,6 +61,7 @@ function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
+      window.alert("Login Successfully");
       console.log("Login Success");
       window.location.href = `/`;
     }
@@ -115,7 +116,7 @@ function Login() {
         </div>
 
         <button
-          style={{ margin: "20px" }}
+          style={{ margin: "20px"}}
           type="submit"
           class="btn btn-primary bg-dark bg-gradient"
         >

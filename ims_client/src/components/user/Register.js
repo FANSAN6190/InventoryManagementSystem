@@ -67,8 +67,8 @@ function Register() {
             window.alert("Successfully Registered, Go to Login Page");
             setTimeout(() => {
               //navigate('/login');
-              window.location.href = "/login";
-            }, 2000);
+              window.location.href = `/`;
+            }, 1000);
           })
           .catch((error) => {
             console.error("Error:", error);
