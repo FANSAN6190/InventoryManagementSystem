@@ -7,7 +7,7 @@ import session from "express-session";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import pgPromise from "pg-promise";
-
+import { Server as socketIo } from "socket.io";
 
 import connectPgSimple from "connect-pg-simple";
 import https from "https";
@@ -20,6 +20,7 @@ const { Pool } = pg;
 
 import inventoriesRouter from "./routes/inventory_functions/inventory_handling.js";
 import getInvDetailsRouter from "./routes/inventory_functions/get_inv_details.js";
+import { Server } from "http";
 // Database connection and credentials
 const pool = new Pool({
   user: process.env.PGUSER,
@@ -38,8 +39,8 @@ const pool = new Pool({
 const app = express();
 const server_port = process.env.PORT || 5600;
 
-const server = require('https').createServer(app);
-const io = socketIo(server);
+const server = https.createServer(app);
+const io = Server(server);
 
 
 app.get("/", (req, res) => {
