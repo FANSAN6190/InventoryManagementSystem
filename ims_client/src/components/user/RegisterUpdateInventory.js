@@ -76,7 +76,7 @@ function RegisterUpdateInventory() {
   useEffect(() => {
     const fetchInventories = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/get-inventories`, {
+        const response = await fetch(`${SERVER_URL}/inventory/get-inventories`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -124,7 +124,7 @@ function RegisterUpdateInventory() {
     try {
       console.log("AUdata");
       console.log(AUdata.inventoryName);
-      const response = await fetch(`${SERVER_URL}/add-update-inventory`, {
+      const response = await fetch(`${SERVER_URL}/inventory/add-update-inventory`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: AUdata,
@@ -268,7 +268,7 @@ function ProductForm({
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/get-suppliers`, {
+        const response = await fetch(`${SERVER_URL}/inventory/get-suppliers`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

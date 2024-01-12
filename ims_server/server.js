@@ -1,19 +1,25 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const bcrypt = require("bcrypt");
-const session = require("express-session");
-const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
-const pgp = require("pg-promise")();
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+import cors from "cors";
+import bcrypt from "bcrypt";
+import session from "express-session";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+import pgPromise from "pg-promise";
 
-const pgSession = require("connect-pg-simple")(session);
-const https = require("https");
-const fs = require("fs");
-const util = require("util");
+import connectPgSimple from "connect-pg-simple";
+import https from "https";
+import fs from "fs";
+import util from "util";
+import pg from "pg";
 
+const pgp = pgPromise();
+const { Pool } = pg;
+
+import inventoriesRouter from "./routes/inventory_functions/inventory_handling.js";
+import getInvDetailsRouter from "./routes/inventory_functions/get_inv_details.js";
 // Database connection and credentials
-const { Pool } = require("pg");
 const pool = new Pool({
   user: process.env.PGUSER,
   host: process.env.PGHOST,
@@ -105,124 +111,8 @@ app.get("/suppliers", async (req, res) => {
 });
 
 //=======================Inventory Handling=========================//
-app.get("/get-inventories", checkAuthenticated, async (req, res) => {
-  try {
-    const client = await pool.connect();
-    const inventoryResult = await client.query(
-      `SELECT inventory_name,inventory_id FROM ims_schema.inventory,ims_schema.users WHERE ims_schema.users.user_code='${req.user_code}' and ims_schema.users.user_name=ims_schema.inventory.user_name;`
-    );
-    const results = { results: inventoryResult ? inventoryResult.rows : null };
-    client.release();
-    console.log(results);
-    return res.json(results);
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-app.get("/get-suppliers", checkAuthenticated, async (req, res) => {
-  try {
-    const client = await pool.connect();
-    const supplierResult = await client.query(
-      `SELECT supplier_id, supplier_name FROM ims_schema.suppliers;`
-    );
-    const results = { results: supplierResult ? supplierResult.rows : null };
-    client.release();
-    console.log(results);
-    return res.json(results);
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-app.post("/add-update-inventory", checkAuthenticated, async (req, res) => {
-  try {
-    const client = await pool.connect();
-    const {
-      inventoryId,
-      inventoryName,
-      productCatalogue,
-      isCreatingNewInventory,
-    } = req.body;
-
-    //console.log(JSON.stringify(productCatalogue,null,2));
-    const userCode = req.user_code;
-    const userName = (
-      await client.query(
-        `SELECT user_name FROM ims_schema.users WHERE user_code='${userCode}';`
-      )
-    ).rows[0].user_name;
-
-    if (isCreatingNewInventory) {
-      const insertNewInventoryQuery = `INSERT INTO ims_schema.inventory(inventory_code,inventory_id,inventory_name,user_name) 
-      VALUES ($1,$2,$3,$4)`;
-      await client.query(insertNewInventoryQuery, [
-        inventoryId,
-        inventoryId,
-        inventoryName,
-        userName,
-      ]);
-    }
-
-    // Fetch the existing product catalogue
-    const existingProductCatalogueQuery = `SELECT product_catalogue FROM ims_schema.inventory WHERE inventory_id=$1`;
-    const existingProductCatalogueResult = await client.query(
-      existingProductCatalogueQuery,
-      [inventoryId]
-    );
-    let existingProductCatalogue =
-      existingProductCatalogueResult.rows[0].product_catalogue;
-    if (existingProductCatalogue == null) {
-      existingProductCatalogue = [];
-    }
-    let totalVolume = 0;
-    let inventoryWorth = 0;
-    let mergedProductCatalogue = [];
-    if (existingProductCatalogue.length + productCatalogue.length > 0) {
-      // Merge the existing product catalogue with the new product catalogue
-      mergedProductCatalogue = [
-        ...existingProductCatalogue,
-        ...productCatalogue,
-      ];
-      mergedProductCatalogue.forEach((product) => {
-        totalVolume += parseInt(product.quantity);
-        inventoryWorth += parseInt(product.quantity) * parseInt(product.price);
-      });
-    }
-    // Update the inventory with the total volume and inventory worth
-    const updateInventoryQuery = `UPDATE ims_schema.inventory SET product_catalogue=$1, no_of_products=$2, total_volume=$3, inventory_worth=$4, last_update=CURRENT_TIMESTAMP  WHERE inventory_id=$5`;
-    await client.query(updateInventoryQuery, [
-      JSON.stringify(mergedProductCatalogue),
-      mergedProductCatalogue.length,
-      totalVolume,
-      inventoryWorth,
-      inventoryId,
-    ]);
-
-    // Insert new products into the products table
-    const insertProductQuery = `INSERT INTO ims_schema.products(product_id, product_name, price, supplier_id, other_details) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (product_id) DO NOTHING`;
-
-    productCatalogue.forEach(async (product) => {
-      console.log(product);
-      const product_id = product.productId;
-      const product_name = product.productName;
-      const price = product.price;
-      const supplier_id = product.supplier.split("/")[1];
-      const otherDetails = product.otherDetails;
-      console.log(product_id, product_name, price, supplier_id, otherDetails);
-      await client.query(insertProductQuery, [
-        product_id,
-        product_name,
-        price,
-        supplier_id,
-        JSON.stringify(otherDetails),
-      ]);
-    });
-  } catch (err) {
-    console.error(err);
-  }
-});
-
+app.use("/inventory", inventoriesRouter(pool));
+app.use("/inventory", getInvDetailsRouter(pool));
 //==================================================================//
 
 //=======================Authentication Handling=========================//
@@ -300,7 +190,7 @@ app.post("/login", async (req, res) => {
 
     if (userResult.rows.length > 0) {
       const user = userResult.rows[0];
-      user_name = user.user_name;
+      const user_name = user.user_name;
       console.log("Server Response : User Found :: " + user_name);
       const match = await bcrypt.compare(password, user.hash_pwd);
       if (match) {
@@ -361,7 +251,7 @@ app.get("/check-login-status", (req, res) => {
 });
 
 // Middleware for checking authentication
-async function checkAuthenticated(req, res, next) {
+export async function checkAuthenticated(req, res, next) {
   const token = req.cookies["token"];
   if (!token) {
     console.log("CA: No token found");
