@@ -33,6 +33,7 @@ function ProductDetails() {
 
   useEffect(() => {
     if (selectedInventory) {
+      setProducts([]);
       fetch(`${SERVER_URL}/products?inventory=${selectedInventory}`, {
         credentials: "include",
       })
