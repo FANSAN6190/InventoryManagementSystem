@@ -12,7 +12,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchInventories = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/get-inventories`, {
+        const response = await fetch(`${SERVER_URL}/inventory/get-inventories`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
