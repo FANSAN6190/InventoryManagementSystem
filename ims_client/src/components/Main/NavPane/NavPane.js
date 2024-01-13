@@ -119,6 +119,9 @@ function NavPane() {
               <Link to="/add_update_inventory">Add/Update Inventory</Link>
             </StyledDropdownItem>
             <StyledDropdownItem>
+              <Link to="/inventory_status">Inventory Status</Link>
+            </StyledDropdownItem>
+            <StyledDropdownItem>
               <Link to="/products">Products</Link>
             </StyledDropdownItem>
             <StyledDropdownItem>
