@@ -7,8 +7,9 @@ import { checkLoginStatus } from "../../user/withAuthCheck";
 import { useEffect, useState } from "react";
 import { SERVER_URL } from "../../../config";
 import { useDispatch } from 'react-redux';
-
+import {useSelector} from 'react-redux'
 import {selectInventory} from "../../../redux/actions/invSelectAction";
+import {invArray} from "../../../redux/actions/invSelectAction";
 
 const StyledNavLink = styled(Link)`
   border-radius: 10px;
@@ -99,7 +100,16 @@ function NavPane() {
         console.error('Error fetching inventories:', error);
       });
   }, []);
-
+  
+  
+  let selInv = useSelector(state => state.inventory.selectedInventory);
+  let invs= useSelector(state => state.inventory.inventory_arr);
+  console.log(selInv);
+  console.log(invs)
+  if(selInv==null){
+    dispatch(selectInventory(inventories[0]));
+    dispatch(invArray(inventories));
+  }
 
   function logout() {
     fetch(`${SERVER_URL}/logout`, {
@@ -186,6 +196,7 @@ function NavPane() {
                 onChange={(e) => {
                   // Handle inventory selection
                   dispatch(selectInventory(e.target.value));
+                  dispatch(invArray(inventories));
                 }}>
                 {inventories.map((inventory, index) => (
                   <option key={index} value={inventory}>
