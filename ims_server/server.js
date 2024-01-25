@@ -23,11 +23,14 @@ import getInvDetailsRouter from "./routes/inventory_functions/get_inv_details.js
 import { Server } from "http";
 // Database connection and credentials
 const pool = new Pool({
-  user: process.env.PGUSER,
-  host: process.env.PGHOST,
-  database: process.env.PGDB,
-  password: process.env.PGPWD,
+  user: process.env.PGUSER,           //    AWS RDS
+  host: process.env.PG_LOCAL_HOST,    //process.env.PGHOST,
+  database: process.env.PG_LOCAL_DB,  //process.env.PGDB,
+  password: process.env.PG_LOCAL_PWD, //process.env.PGPWD,
   port: process.env.PGPORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Loading SSL certificate and key
@@ -53,7 +56,6 @@ app.use(
     origin: [
       "http://localhost:5800",
       "https://localhost:5800",
-      "https://inventory-management-system-gold.vercel.app",
       "https://www.stockspheretrack.live",
       "https://inventory-handling.d2ml9helmogfuu.amplifyapp.com",
     ],
@@ -84,7 +86,7 @@ app.get("/products", checkAuthenticated, async (req, res) => {
       from ims_schema.users u, ims_schema.inventory i, ims_schema.products p,
       jsonb_array_elements(i.product_catalogue) as pc
       where u.user_code=$1 
-      and u.user_name=i.user_name 
+      and u.user_id=i.user_id 
       and p.product_id=pc->>'productId'
       and i.inventory_id=$2`,
       [req.user_code, req.query.inventory]
@@ -125,48 +127,65 @@ app.use("/inventory", getInvDetailsRouter(pool));
 const jwtVerify = util.promisify(jwt.verify);
 app.post("/register", async (req, res) => {
   const {
-    userName,
+    user_id,
     fullName,
     dob,
     email,
-    countryCode,
     phoneNo,
     password,
     confirmPass,
   } = req.body;
+
+  // Check if any of the required fields are missing
+  if (!user_id || !fullName || !dob || !email || !phoneNo || !password || !confirmPass) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
   const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, saltRounds);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Failed to hash password' });
+  }
 
   // Connect to the database
-  const client = await pool.connect();
+  let client;
+  try {
+    client = await pool.connect();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Failed to connect to database' });
+  }
+
   try {
     // Insert the user data into the database
     const { rows } = await client.query(
       "SELECT nextval('ims_schema.user_code_seq')"
     );
     const userCounter = rows[0].nextval;
-    const userCode =
-      userName.substring(0, 4) +
-      phoneNo.substring(phoneNo.length - 4) +
-      String(userCounter).padStart(4, "0");
+    const userCode = user_id + phoneNo.substring(phoneNo.length - 4) + String(userCounter).padStart(4, "0");
 
-    const insertUserQuery = `
-      INSERT INTO ims_schema.users(user_code, user_name, full_name, dob, email, country_code, phone_no, hash_pwd)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `;
+    const insertUserQuery = `INSERT INTO ims_schema.users(user_id, user_code, full_name, email, phone_no, dob, hash_pwd)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+    
     const values = [
+      user_id,
       userCode,
-      userName,
       fullName,
-      dob,
       email,
-      countryCode,
       phoneNo,
-      hashedPassword,
+      dob,
+      hashedPassword
     ];
-    console.log(values);
-    await client.query(insertUserQuery, values);
-
+    try{
+      await client.query(insertUserQuery, values);
+    }catch(err){
+      console.error(err);
+      throw new Error('Failed to insert user data into database');
+    }
+    
     // Send a success response
     res.status(201).json({
       status: "success",
@@ -176,10 +195,12 @@ app.post("/register", async (req, res) => {
     console.error(err);
     res.status(500).json({
       status: "error",
-      message: "Server Response : An error occurred during registration",
+      message: err.message,
     });
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 });
 
@@ -189,14 +210,14 @@ app.post("/login", async (req, res) => {
     const client = await pool.connect();
     const { email, phone, password } = req.body;
     const userResult = await client.query(
-      "SELECT * FROM ims_schema.users WHERE email = $1 AND phone_no = $2",
+      "SELECT user_id, user_code, hash_pwd FROM ims_schema.users WHERE email = $1 AND phone_no = $2",
       [email, phone]
     );
 
     if (userResult.rows.length > 0) {
       const user = userResult.rows[0];
-      const user_name = user.user_name;
-      console.log("Server Response : User Found :: " + user_name);
+      const user_id = user.user_id;
+      console.log("Server Response : User Found :: " + user_id);
       const match = await bcrypt.compare(password, user.hash_pwd);
       if (match) {
         // User authenticated successfully
@@ -216,6 +237,7 @@ app.post("/login", async (req, res) => {
         });
       } else {
         // User authentication failed
+        console.log("Server Response : Authentication failed");
         res
           .status(401)
           .json({ status: "error", message: "Authentication failed" });
