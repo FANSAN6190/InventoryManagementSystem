@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./RegisterUpdateInventory.css";
 import { SERVER_URL } from "../../config";
+import CreatableSelect from "react-select/creatable";
 
 function RegisterUpdateInventory() {
   const [inventoryNameId, setInventoryNameId] = useState("");
@@ -76,11 +77,14 @@ function RegisterUpdateInventory() {
   useEffect(() => {
     const fetchInventories = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/inventory/get-inventories`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${SERVER_URL}/inventory/get-inventories`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }
+        );
         const data = await response.json();
         setExistingInventories(
           data.results.map(
@@ -124,12 +128,15 @@ function RegisterUpdateInventory() {
     try {
       console.log("AUdata");
       console.log(AUdata.inventoryName);
-      const response = await fetch(`${SERVER_URL}/inventory/add-update-inventory`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: AUdata,
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${SERVER_URL}/inventory/add-update-inventory`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: AUdata,
+          credentials: "include",
+        }
+      );
       if (response.status === 200) {
         console.log("Inventory Registered");
       } else {
@@ -173,7 +180,7 @@ function RegisterUpdateInventory() {
         <h1 className="text-center">
           <strong>Add/Update Inventory</strong>
         </h1>
-        <div className="form-group" style={{ padding: "20px" }}>
+        {/* <div className="form-group" style={{ padding: "20px" }}>
           <h3>Select Inventory</h3>
           <label htmlFor="inventoryName">Inventory Name/ID</label>
           <select
@@ -223,7 +230,7 @@ function RegisterUpdateInventory() {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
         <div style={{ maxHeight: "500px", overflowY: "auto" }}>
           {productCatalogue.map((product, index) => (
             <>
@@ -264,7 +271,22 @@ function ProductForm({
   deleteOtherDetails,
   addOtherDetails,
 }) {
+  const ItemCategories = ["Electronics", "Books", "Clothing"]; // Add more categories as needed
+  const categoryOptions = ItemCategories.map((category) => ({
+    value: category,
+    label: category,
+  }));
+  const itemTypes = ["Type1", "Type2", "Type3"]; // Replace with your actual item types
+  const typeOptions = itemTypes.map((type) => ({ value: type, label: type }));
+  const brands = ["Brand1", "Brand2", "Brand3"]; // Replace with your actual brands
+  const brandOptions = brands.map((brand) => ({ value: brand, label: brand }));
+  const HSNCodes = ["HSN1", "HSN2", "HSN3"]; // Replace with your actual HSN codes
+  const hsnOptions = HSNCodes.map((hsn) => ({ value: hsn, label: hsn }));
+
+  const [lastClicked, setLastClicked] = useState(null); // Add this state variable to keep track of the last clicked radio button
+  const [selection, setSelection] = useState(""); // Add this state variable to keep track of the selection
   const [existingSuppliers, setExistingSuppliers] = useState([]);
+
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
@@ -287,149 +309,191 @@ function ProductForm({
   }, []);
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          backgroundColor: "#bef4f7",
-          padding: "10px",
-        }}
-      >
-        <h5> {index + 1}. </h5>
-        <div className="form-group">
-          <label htmlFor={`productName${index}`}>Product Name:</label>
-          <input
-            type="text"
-            className="form-control"
-            id={`productName${index}`}
-            value={product.productName}
-            style={{ width: "500px" }}
-            onChange={(e) =>
-              updateProduct(index, "productName", e.target.value)
-            }
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor={`productId${index}`}>Product ID:</label>
-          <input
-            type="text"
-            className="form-control"
-            id={`productId${index}`}
-            value={product.productId}
-            style={{ width: "150px" }}
-            onChange={(e) => updateProduct(index, "productId", e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor={`price${index}`}>Price:</label>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <span>₹</span>
+      <div style={{ backgroundColor: "#bef4f7", padding: "10px" }}>
+        <div>
+          <div
+            className="form-group"
+            style={{ display: "flex", justifyContent: "space-evenly" }}
+          >
+            <h5> {index + 1}. </h5>
+            <div className="form-group">
+              <label htmlFor={`productId${index}`}>Item Code/Bar Code:</label>
+              <input
+                type="text"
+                className="form-control"
+                id={`productId${index}`}
+                value={product.productId}
+                style={{ width: "150px" }}
+                onChange={(e) =>
+                  updateProduct(index, "productId", e.target.value)
+                }
+                required
+              />
+            </div>
+
+            <label htmlFor={`productName${index}`}>Item Name:</label>
+            <input
+              type="text"
+              className="form-control"
+              id={`productName${index}`}
+              value={product.productName}
+              onChange={(e) =>
+                updateProduct(index, "productName", e.target.value)
+              }
+              required
+            />
+
+            <label htmlFor={`brand${index}`}>Brand:</label>
+            <CreatableSelect
+              isClearable
+              id={`brand${index}`}
+              value={brandOptions.find(
+                (option) => option.value === product.brand
+              )}
+              onChange={(e) => updateProduct(index, "brand", e ? e.value : "")}
+              options={brandOptions}
+            />
+
+            <label htmlFor={`price${index}`}>Price:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span>₹</span>
+              <input
+                type="number"
+                className="form-control"
+                style={{ width: "100px", marginLeft: "5px" }}
+                id={`price${index}`}
+                value={product.price}
+                onChange={(e) => updateProduct(index, "price", e.target.value)}
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+            <label htmlFor={`quantity${index}`}>Quantity:</label>
             <input
               type="number"
               className="form-control"
-              style={{ width: "100px", marginLeft: "5px" }}
-              id={`price${index}`}
-              value={product.price}
-              onChange={(e) => updateProduct(index, "price", e.target.value)}
-              step="0.01"
+              style={{ width: "100px" }}
+              id={`quantity${index}`}
+              value={product.quantity}
+              onChange={(e) => updateProduct(index, "quantity", e.target.value)}
               min="0"
               required
             />
+            <button
+              type="button"
+              style={{ width: "130px", height: "30px", marginTop: "30px" }}
+              onClick={() => deleteProduct(index)}
+            >
+              Delete Product
+            </button>
           </div>
         </div>
-        <div className="form-group">
-          <label htmlFor={`quantity${index}`}>Quantity:</label>
-          <input
-            type="number"
-            className="form-control"
-            style={{ width: "100px" }}
-            id={`quantity${index}`}
-            value={product.quantity}
-            onChange={(e) => updateProduct(index, "quantity", e.target.value)}
-            min="0"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor={`supplier${index}`}>Supplier ID:</label>
-          <select
-            className="form-control"
-            id={`supplier${index}`}
-            style={{ width: "200px" }}
-            value={product.supplier}
-            onChange={(e) => updateProduct(index, "supplier", e.target.value)}
-            required
+
+        <div>
+          <div
+            className="form-group"
+            style={{ display: "flex", justifyContent: "space-evenly" }}
           >
-            <option value="">Select a supplier</option>
-            {existingSuppliers.map((supplierId, supplierIndex) => (
-              <option key={supplierIndex} value={supplierId}>
-                {supplierId}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button
-          type="button"
-          style={{ width: "130px", height: "30px", marginTop: "30px" }}
-          onClick={() => deleteProduct(index)}
-        >
-          Delete Product
-        </button>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "normal",
-          backgroundColor: "#7af6ff",
-          padding: "10px",
-        }}
-      >
-        <button
-          type="button"
-          className="add-details-button"
-          onClick={() => addOtherDetails(index)}
-        >
-          Add Other Product Details
-        </button>
-        <div style={{ width: "1000px", marginLeft: "80px" }}>
-          {product.otherDetails.map((desc, descIndex) => (
-            <div
-              key={descIndex}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "5px",
+            <label htmlFor={`type${index}`}>Type:</label>
+            <CreatableSelect
+              isClearable
+              id={`type${index}`}
+              value={typeOptions.find(
+                (option) => option.value === product.type
+              )}
+              onChange={(e) => updateProduct(index, "type", e ? e.value : "")}
+              options={typeOptions}
+              style={{ width: "200px" }}
+            />
+
+            <input
+              type="radio"
+              id={`category${index}`}
+              value="category"
+              checked={selection === "category"}
+              onClick={(e) => {
+                if (lastClicked === e.target.value) {
+                  setSelection("");
+                  setLastClicked(null);
+                } else {
+                  setSelection(e.target.value);
+                  setLastClicked(e.target.value);
+                }
               }}
+            />
+            <label htmlFor={`category${index}`}>Item Category</label>
+
+            <input
+              type="radio"
+              id={`hsn${index}`}
+              value="hsn"
+              checked={selection === "hsn"}
+              onClick={(e) => {
+                if (lastClicked === e.target.value) {
+                  setSelection("");
+                  setLastClicked(null);
+                } else {
+                  setSelection(e.target.value);
+                  setLastClicked(e.target.value);
+                }
+              }}
+            />
+            <label htmlFor={`hsn${index}`}>HSN Code</label>
+
+            {selection === "category" && (
+              <div className="form-group">
+                <label htmlFor={`categorySelect${index}`}>Item Category:</label>
+                <CreatableSelect
+                  isClearable
+                  id={`categorySelect${index}`}
+                  value={categoryOptions.find(
+                    (option) => option.value === product.category
+                  )}
+                  onChange={(e) =>
+                    updateProduct(index, "category", e ? e.value : "")
+                  }
+                  options={categoryOptions}
+                  style={{ width: "200px" }}
+                />
+              </div>
+            )}
+
+            {selection === "hsn" && (
+              <div className="form-group">
+                <label htmlFor={`hsnSelect${index}`}>HSN Code:</label>
+                <CreatableSelect
+                  isClearable
+                  id={`hsnSelect${index}`}
+                  value={hsnOptions.find(
+                    (option) => option.value === product.hsn
+                  )}
+                  onChange={(e) =>
+                    updateProduct(index, "hsn", e ? e.value : "")
+                  }
+                  options={hsnOptions}
+                  style={{ width: "200px" }}
+                />
+              </div>
+            )}
+
+            <label htmlFor={`supplier${index}`}>Supplier ID:</label>
+            <select
+              className="form-control"
+              id={`supplier${index}`}
+              style={{ width: "200px" }}
+              value={product.supplier}
+              onChange={(e) => updateProduct(index, "supplier", e.target.value)}
+              required
             >
-              <input
-                type="text"
-                placeholder="Enter Property"
-                value={desc.key}
-                onChange={(e) =>
-                  updateOtherDetails(index, descIndex, "key", e.target.value)
-                }
-                required
-              />
-              <input
-                style={{ width: "600px" }}
-                type="text"
-                placeholder="Value"
-                value={desc.value}
-                onChange={(e) =>
-                  updateOtherDetails(index, descIndex, "value", e.target.value)
-                }
-                required
-              />
-              <button
-                type="button"
-                onClick={() => deleteOtherDetails(index, descIndex)}
-              >
-                Delete
-              </button>
-            </div>
-          ))}
+              <option value="">Select a supplier</option>
+              {existingSuppliers.map((supplierId, supplierIndex) => (
+                <option key={supplierIndex} value={supplierId}>
+                  {supplierId}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </div>

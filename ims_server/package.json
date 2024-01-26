@@ -12,6 +12,7 @@
   "author": "Fanindra Saini and Hrishav Sharma",
   "license": "ISC",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.1.0",
     "@vercel/postgres": "^0.5.1",
     "bcrypt": "^5.1.1",
     "connect-pg-simple": "^9.0.1",
@@ -25,6 +26,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
     "pg-promise": "^11.5.4",
+    "redux": "^5.0.1",
     "socket.io": "^4.7.4",
     "vercel": "^33.0.1"
   },

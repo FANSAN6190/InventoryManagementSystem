@@ -185,7 +185,7 @@ function NavPane() {
               <Link to="/api/user">Orders</Link>
             </StyledDropdownItem>
           </NavDropdown>
-          <Button as={StyledNavLink} id="logout" style={{display:"none"}} onClick={logout}>
+          <Button as={StyledNavLink} id="logout" style={{display:"none", height:"10%"}} onClick={logout}>
             Logout
           </Button>
           <StyledDiv>

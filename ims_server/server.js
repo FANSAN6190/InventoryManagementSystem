@@ -3,19 +3,13 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
-import session from "express-session";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import pgPromise from "pg-promise";
-import { Server as socketIo } from "socket.io";
-
-import connectPgSimple from "connect-pg-simple";
 import https from "https";
-import fs from "fs";
 import util from "util";
 import pg from "pg";
 
-const pgp = pgPromise();
 const { Pool } = pg;
 
 import inventoriesRouter from "./routes/inventory_functions/inventory_handling.js";
@@ -51,6 +45,7 @@ app.get("/", (req, res) => {
 });
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(
   cors({
     origin: [
