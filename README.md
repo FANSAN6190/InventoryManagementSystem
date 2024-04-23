@@ -1,12 +1,21 @@
-How to run application on localhost?
+### Scalable React based application for small businesses/shopkeepers to manage there inventories in real time.
 
-after setup
+
+### Techstack
+1. NodeJS
+2. React
+3. PostgreSQL
+4. HTML/CSS/Bootstrap/JavaScript
+5. Shell Scripting
+
+Deployed frontend using AWS amplify on https://www.stockspheretrack.live
+
+##### NodeJS Server
+Run in Production mode:  
 $ ./run_app.sh
 
-for development
+Run in development mode:  
 $ ./run_app.sh dev
 
-
-for 
-close 
+Kill server:  
 $ ./kill_app.sh
