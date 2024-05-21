@@ -17,14 +17,14 @@ import getInvDetailsRouter from "./routes/inventory_functions/get_inv_details.js
 import { Server } from "http";
 // Database connection and credentials
 const pool = new Pool({
-  user: process.env.PGUSER,           //    AWS RDS
-  host: process.env.PG_LOCAL_HOST,    //process.env.PGHOST,
-  database: process.env.PG_LOCAL_DB,  //process.env.PGDB,
+  user: process.env.PGUSER, //    AWS RDS
+  host: process.env.PG_LOCAL_HOST, //process.env.PGHOST,
+  database: process.env.PG_LOCAL_DB, //process.env.PGDB,
   password: process.env.PG_LOCAL_PWD, //process.env.PGPWD,
   port: process.env.PGPORT,
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 // Loading SSL certificate and key
@@ -38,7 +38,6 @@ const server_port = process.env.PORT || 5600;
 
 const server = https.createServer(app);
 const io = Server(server);
-
 
 app.get("/", (req, res) => {
   res.send("This is IMS Server root api");
@@ -121,19 +120,20 @@ app.use("/inventory", getInvDetailsRouter(pool));
 
 const jwtVerify = util.promisify(jwt.verify);
 app.post("/register", async (req, res) => {
-  const {
-    user_id,
-    fullName,
-    dob,
-    email,
-    phoneNo,
-    password,
-    confirmPass,
-  } = req.body;
+  const { user_id, fullName, dob, email, phoneNo, password, confirmPass } =
+    req.body;
 
   // Check if any of the required fields are missing
-  if (!user_id || !fullName || !dob || !email || !phoneNo || !password || !confirmPass) {
-    return res.status(400).json({ error: 'All fields are required' });
+  if (
+    !user_id ||
+    !fullName ||
+    !dob ||
+    !email ||
+    !phoneNo ||
+    !password ||
+    !confirmPass
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
   }
 
   const saltRounds = 10;
@@ -142,7 +142,7 @@ app.post("/register", async (req, res) => {
     hashedPassword = await bcrypt.hash(password, saltRounds);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Failed to hash password' });
+    return res.status(500).json({ error: "Failed to hash password" });
   }
 
   // Connect to the database
@@ -151,7 +151,7 @@ app.post("/register", async (req, res) => {
     client = await pool.connect();
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Failed to connect to database' });
+    return res.status(500).json({ error: "Failed to connect to database" });
   }
 
   try {
@@ -160,11 +160,14 @@ app.post("/register", async (req, res) => {
       "SELECT nextval('ims_schema.user_code_seq')"
     );
     const userCounter = rows[0].nextval;
-    const userCode = user_id + phoneNo.substring(phoneNo.length - 4) + String(userCounter).padStart(4, "0");
+    const userCode =
+      user_id +
+      phoneNo.substring(phoneNo.length - 4) +
+      String(userCounter).padStart(4, "0");
 
     const insertUserQuery = `INSERT INTO ims_schema.users(user_id, user_code, full_name, email, phone_no, dob, hash_pwd)
       VALUES ($1, $2, $3, $4, $5, $6, $7)`;
-    
+
     const values = [
       user_id,
       userCode,
@@ -172,15 +175,15 @@ app.post("/register", async (req, res) => {
       email,
       phoneNo,
       dob,
-      hashedPassword
+      hashedPassword,
     ];
-    try{
+    try {
       await client.query(insertUserQuery, values);
-    }catch(err){
+    } catch (err) {
       console.error(err);
-      throw new Error('Failed to insert user data into database');
+      throw new Error("Failed to insert user data into database");
     }
-    
+
     // Send a success response
     res.status(201).json({
       status: "success",

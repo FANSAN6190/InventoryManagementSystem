@@ -4,7 +4,6 @@ import { SERVER_URL } from "../../config";
 import CreatableSelect from "react-select/creatable";
 
 function RegisterUpdateInventory() {
-  const [inventoryNameId, setInventoryNameId] = useState("");
   const [productCatalogue, setProductCatalogue] = useState([
     {
       productName: "",
@@ -49,68 +48,20 @@ function RegisterUpdateInventory() {
     setProductCatalogue(productCatalogue.filter((_, i) => i !== index));
   };
 
-  const updateOtherDetails = (productIndex, descIndex, field, value) => {
-    const newProductCatalogue = [...productCatalogue];
-    newProductCatalogue[productIndex].otherDetails[descIndex][field] = value;
-    setProductCatalogue(newProductCatalogue);
-  };
-
-  const deleteOtherDetails = (productIndex, descIndex) => {
-    const newProductCatalogue = [...productCatalogue];
-    newProductCatalogue[productIndex].otherDetails = newProductCatalogue[
-      productIndex
-    ].otherDetails.filter((_, i) => i !== descIndex);
-    setProductCatalogue(newProductCatalogue);
-  };
-
-  const addOtherDetails = (productIndex) => {
-    const newProductCatalogue = [...productCatalogue];
-    newProductCatalogue[productIndex].otherDetails.push({ key: "", value: "" });
-    setProductCatalogue(newProductCatalogue);
-  };
-
   const [isCreatingNewInventory, setIsCreatingNewInventory] = useState(false);
-  const [newInventoryName, setNewInventoryName] = useState("");
-  const [newInventoryId, setNewInventoryId] = useState("");
-
-  const [existingInventories, setExistingInventories] = useState([]);
-  useEffect(() => {
-    const fetchInventories = async () => {
-      try {
-        const response = await fetch(
-          `${SERVER_URL}/inventory/get-inventories`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        setExistingInventories(
-          data.results.map(
-            (inventory) =>
-              inventory.inventory_name + "/" + inventory.inventory_id
-          )
-        );
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-    fetchInventories();
-  }, []);
 
   const getInputInJson = () => {
-    const inputInJson = JSON.stringify({
-      inventoryName: isCreatingNewInventory
-        ? newInventoryName
-        : inventoryNameId.split("/")[0],
-      inventoryId: isCreatingNewInventory
-        ? newInventoryId
-        : inventoryNameId.split("/")[1],
-      productCatalogue,
-      isCreatingNewInventory,
-    });
-    return inputInJson;
+    // const inputInJson = JSON.stringify({
+    //   inventoryName: isCreatingNewInventory
+    //     ? newInventoryName
+    //     : inventoryNameId.split("/")[0],
+    //   inventoryId: isCreatingNewInventory
+    //     ? newInventoryId
+    //     : inventoryNameId.split("/")[1],
+    //   productCatalogue,
+    //   isCreatingNewInventory,
+    // });
+    // return inputInJson;
   };
 
   const sendInventoryData = async (event) => {
@@ -180,57 +131,6 @@ function RegisterUpdateInventory() {
         <h1 className="text-center">
           <strong>Add/Update Inventory</strong>
         </h1>
-        {/* <div className="form-group" style={{ padding: "20px" }}>
-          <h3>Select Inventory</h3>
-          <label htmlFor="inventoryName">Inventory Name/ID</label>
-          <select
-            className="form-control"
-            id="inventoryName"
-            value={inventoryNameId}
-            onChange={(e) => {
-              setInventoryNameId(e.target.value);
-              setIsCreatingNewInventory(e.target.value === "new");
-            }}
-            required
-          >
-            <option value="">Select existing inventory</option>
-            <option value="new">Create new inventory</option>
-            {existingInventories.map((inventory, index) => (
-              <option key={index} value={inventory}>
-                {inventory}
-              </option>
-            ))}
-          </select>
-
-          {isCreatingNewInventory && (
-            <div style={{ display: "flex", marginTop: "20px" }}>
-              <div style={{ marginRight: "20px" }}>
-                <label htmlFor="newInventoryName">New Inventory Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="newInventoryName"
-                  placeholder="Enter new inventory name"
-                  value={newInventoryName}
-                  onChange={(e) => setNewInventoryName(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor={`inventoryId`}>Inventory ID</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id={`inventoryId`}
-                  style={{ width: "500px" }}
-                  placeholder="Create inventory ID"
-                  value={newInventoryId}
-                  onChange={(e) => setNewInventoryId(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          )}
-        </div> */}
         <div style={{ maxHeight: "500px", overflowY: "auto" }}>
           {productCatalogue.map((product, index) => (
             <>
@@ -240,10 +140,8 @@ function RegisterUpdateInventory() {
                 index={index}
                 updateProduct={updateProduct}
                 deleteProduct={deleteProduct}
-                updateOtherDetails={updateOtherDetails}
-                deleteOtherDetails={deleteOtherDetails}
-                addOtherDetails={addOtherDetails}
               />
+
               <br></br>
             </>
           ))}
@@ -262,15 +160,7 @@ function RegisterUpdateInventory() {
     </div>
   );
 }
-function ProductForm({
-  product,
-  index,
-  updateProduct,
-  deleteProduct,
-  updateOtherDetails,
-  deleteOtherDetails,
-  addOtherDetails,
-}) {
+function ProductForm({ product, index, updateProduct, deleteProduct }) {
   const ItemCategories = ["Electronics", "Books", "Clothing"]; // Add more categories as needed
   const categoryOptions = ItemCategories.map((category) => ({
     value: category,
@@ -311,12 +201,9 @@ function ProductForm({
     <div>
       <div style={{ backgroundColor: "#bef4f7", padding: "10px" }}>
         <div>
-          <div
-            className="form-group"
-            style={{ display: "flex", justifyContent: "space-evenly" }}
-          >
+          <div className="form-group" style={{ display: "flex" }}>
             <h5> {index + 1}. </h5>
-            <div className="form-group">
+            <div style={{ display: "flex" }}>
               <label htmlFor={`productId${index}`}>Item Code/Bar Code:</label>
               <input
                 type="text"
@@ -330,32 +217,37 @@ function ProductForm({
                 required
               />
             </div>
+            <div style={{ display: "flex" }}>
+              <label htmlFor={`productName${index}`}>Item Name:</label>
+              <input
+                type="text"
+                className="form-control"
+                id={`productName${index}`}
+                value={product.productName}
+                onChange={(e) =>
+                  updateProduct(index, "productName", e.target.value)
+                }
+                required
+              />
+            </div>
 
-            <label htmlFor={`productName${index}`}>Item Name:</label>
-            <input
-              type="text"
-              className="form-control"
-              id={`productName${index}`}
-              value={product.productName}
-              onChange={(e) =>
-                updateProduct(index, "productName", e.target.value)
-              }
-              required
-            />
+            <div style={{ display: "flex" }}>
+              <label htmlFor={`brand${index}`}>Brand:</label>
+              <CreatableSelect
+                isClearable 
+                id={`brand${index}`}
+                value={brandOptions.find(
+                  (option) => option.value === product.brand
+                )}
+                onChange={(e) =>
+                  updateProduct(index, "brand", e ? e.value : "")
+                }
+                options={brandOptions}
+              />
+            </div>
 
-            <label htmlFor={`brand${index}`}>Brand:</label>
-            <CreatableSelect
-              isClearable
-              id={`brand${index}`}
-              value={brandOptions.find(
-                (option) => option.value === product.brand
-              )}
-              onChange={(e) => updateProduct(index, "brand", e ? e.value : "")}
-              options={brandOptions}
-            />
-
-            <label htmlFor={`price${index}`}>Price:</label>
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex" }}>
+              <label htmlFor={`price${index}`}>Price:</label>
               <span>₹</span>
               <input
                 type="number"
@@ -369,17 +261,20 @@ function ProductForm({
                 required
               />
             </div>
-            <label htmlFor={`quantity${index}`}>Quantity:</label>
-            <input
-              type="number"
-              className="form-control"
-              style={{ width: "100px" }}
-              id={`quantity${index}`}
-              value={product.quantity}
-              onChange={(e) => updateProduct(index, "quantity", e.target.value)}
-              min="0"
-              required
-            />
+
+            <div style={{ display: "flex"}}>
+              <label htmlFor={`quantity${index}`}>Quantity:</label>
+              <input
+                type="number"
+                className="form-control"
+                style={{ width: "100px" }}
+                id={`quantity${index}`}
+                value={product.quantity}
+                onChange={(e) => updateProduct(index, "quantity", e.target.value)}
+                min="0"
+                required
+              />
+            </div>
             <button
               type="button"
               style={{ width: "130px", height: "30px", marginTop: "30px" }}
@@ -395,104 +290,121 @@ function ProductForm({
             className="form-group"
             style={{ display: "flex", justifyContent: "space-evenly" }}
           >
-            <label htmlFor={`type${index}`}>Type:</label>
-            <CreatableSelect
-              isClearable
-              id={`type${index}`}
-              value={typeOptions.find(
-                (option) => option.value === product.type
-              )}
-              onChange={(e) => updateProduct(index, "type", e ? e.value : "")}
-              options={typeOptions}
-              style={{ width: "200px" }}
-            />
+            <div style={{ display: "flex" }}>
+              <label htmlFor={`type${index}`}>Type:</label>
+              <CreatableSelect
+                isClearable
+                id={`type${index}`}
+                value={typeOptions.find(
+                  (option) => option.value === product.type
+                )}
+                onChange={(e) => updateProduct(index, "type", e ? e.value : "")}
+                options={typeOptions}
+                style={{ width: "200px" }}
+              />
+            </div>
 
-            <input
-              type="radio"
-              id={`category${index}`}
-              value="category"
-              checked={selection === "category"}
-              onClick={(e) => {
-                if (lastClicked === e.target.value) {
-                  setSelection("");
-                  setLastClicked(null);
-                } else {
-                  setSelection(e.target.value);
-                  setLastClicked(e.target.value);
-                }
-              }}
-            />
-            <label htmlFor={`category${index}`}>Item Category</label>
-
-            <input
-              type="radio"
-              id={`hsn${index}`}
-              value="hsn"
-              checked={selection === "hsn"}
-              onClick={(e) => {
-                if (lastClicked === e.target.value) {
-                  setSelection("");
-                  setLastClicked(null);
-                } else {
-                  setSelection(e.target.value);
-                  setLastClicked(e.target.value);
-                }
-              }}
-            />
-            <label htmlFor={`hsn${index}`}>HSN Code</label>
-
-            {selection === "category" && (
-              <div className="form-group">
-                <label htmlFor={`categorySelect${index}`}>Item Category:</label>
-                <CreatableSelect
-                  isClearable
-                  id={`categorySelect${index}`}
-                  value={categoryOptions.find(
-                    (option) => option.value === product.category
-                  )}
-                  onChange={(e) =>
-                    updateProduct(index, "category", e ? e.value : "")
-                  }
-                  options={categoryOptions}
-                  style={{ width: "200px" }}
-                />
+            <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div>
+                  <input
+                    type="radio"
+                    id={`category${index}`}
+                    value="category"
+                    checked={selection === "category"}
+                    onClick={(e) => {
+                      if (lastClicked === e.target.value) {
+                        setSelection("");
+                        setLastClicked(null);
+                      } else {
+                        setSelection(e.target.value);
+                        setLastClicked(e.target.value);
+                      }
+                    }}
+                  />
+                  <label htmlFor={`category${index}`}>Item Category</label>
+                </div>
+                <div>
+                  <input
+                    type="radio"
+                    id={`hsn${index}`}
+                    value="hsn"
+                    checked={selection === "hsn"}
+                    onClick={(e) => {
+                      if (lastClicked === e.target.value) {
+                        setSelection("");
+                        setLastClicked(null);
+                      } else {
+                        setSelection(e.target.value);
+                        setLastClicked(e.target.value);
+                      }
+                    }}
+                  />
+                  <label htmlFor={`hsn${index}`}>HSN Code</label>
+                </div>
               </div>
-            )}
-
-            {selection === "hsn" && (
-              <div className="form-group">
-                <label htmlFor={`hsnSelect${index}`}>HSN Code:</label>
-                <CreatableSelect
-                  isClearable
-                  id={`hsnSelect${index}`}
-                  value={hsnOptions.find(
-                    (option) => option.value === product.hsn
-                  )}
-                  onChange={(e) =>
-                    updateProduct(index, "hsn", e ? e.value : "")
-                  }
-                  options={hsnOptions}
-                  style={{ width: "200px" }}
-                />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginLeft: "10px",
+                }}
+              >
+                {selection === "category" && (
+                  <div className="form-group">
+                    <CreatableSelect
+                      isClearable
+                      id={`categorySelect${index}`}
+                      value={categoryOptions.find(
+                        (option) => option.value === product.category
+                      )}
+                      onChange={(e) =>
+                        updateProduct(index, "category", e ? e.value : "")
+                      }
+                      options={categoryOptions}
+                      style={{ width: "200px" }}
+                    />
+                  </div>
+                )}
+                {selection === "hsn" && (
+                  <div className="form-group">
+                    <CreatableSelect
+                      isClearable
+                      id={`hsnSelect${index}`}
+                      value={hsnOptions.find(
+                        (option) => option.value === product.hsn
+                      )}
+                      onChange={(e) =>
+                        updateProduct(index, "hsn", e ? e.value : "")
+                      }
+                      options={hsnOptions}
+                      style={{ width: "200px" }}
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
-            <label htmlFor={`supplier${index}`}>Supplier ID:</label>
-            <select
-              className="form-control"
-              id={`supplier${index}`}
-              style={{ width: "200px" }}
-              value={product.supplier}
-              onChange={(e) => updateProduct(index, "supplier", e.target.value)}
-              required
-            >
-              <option value="">Select a supplier</option>
-              {existingSuppliers.map((supplierId, supplierIndex) => (
-                <option key={supplierIndex} value={supplierId}>
-                  {supplierId}
-                </option>
-              ))}
-            </select>
+            <div style={{ display: "flex" }}>
+              <label htmlFor={`supplier${index}`}>Supplier ID:</label>
+              <select
+                className="form-control"
+                id={`supplier${index}`}
+                style={{ width: "200px", marginLeft: "5px" }}
+                value={product.supplier}
+                onChange={(e) =>
+                  updateProduct(index, "supplier", e.target.value)
+                }
+                required
+              >
+                <option value="">Select a supplier</option>
+                {existingSuppliers.map((supplierId, supplierIndex) => (
+                  <option key={supplierIndex} value={supplierId}>
+                    {supplierId}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
