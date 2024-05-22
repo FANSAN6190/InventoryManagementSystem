@@ -43,6 +43,9 @@ function Register() {
       if (password !== confirmPass) {
         alert("Passwords do not match");
       } else {
+        const registerData = {fullName, dob, email, phoneNo, password, confirmPass };
+        console.log("Sending registration data:", registerData);   
+
         // Send the registration data to the server
         fetch(`${SERVER_URL}/auth/register`, {
           method: "POST",
@@ -55,8 +58,7 @@ function Register() {
             dob,
             email,
             phoneNo,
-            password,
-            confirmPass,
+            password
           }),
         })
           .then((response) => {

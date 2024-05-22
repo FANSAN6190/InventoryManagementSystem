@@ -1,7 +1,6 @@
 import pool from "../../config/DBConfig.js";
-import pool from '../../config/DBConfig.js'
 
-function RegisterService(register_request) {
+export async function RegisterService(register_request) {
     const { fullName, dob, email, phoneNo, password} = register_request.body;
 
     const hashedPassword = passwordHashing(password);
