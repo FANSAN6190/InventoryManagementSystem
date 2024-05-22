@@ -3,7 +3,7 @@ dotenv.config();
 import express from "express";
 import https from "https";
 
-import authenticationRouter from "./src/controller/authenticationController/Authentication.js";
+import authenticationRouter from "./src/Controller/AuthenticationController.js";
 
 const app = express();
 const server_port = process.env.PORT || 5600;
@@ -32,3 +32,5 @@ app.listen(server_port, () => {
   const url = `http://localhost:${server_port}`;
   console.log(`URL: ${url}`);
 });
+
+export default app;
