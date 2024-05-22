@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAuthenticated } from "../../server.js";
+import { checkAuthenticated } from "../authenticationController/authentication.js";
 
 export default function inventoriesRouter(pool) {
   const router = express.Router();
@@ -9,31 +9,24 @@ export default function inventoriesRouter(pool) {
       const client = await pool.connect();
       const {
         inventoryId,
-        inventoryName,
+        inventoryName,  
         productCatalogue,
         isCreatingNewInventory,
       } = req.body;
 
       //console.log(JSON.stringify(productCatalogue,null,2));
-      const userCode = req.user_code;
-      const userName = (
-        await client.query(
-          `SELECT user_name FROM ims_schema.users WHERE user_code='${userCode}';`
-        )
-      ).rows[0].user_name;
-
+      const user_code = req.user_code;
       if (isCreatingNewInventory) {
-        const insertNewInventoryQuery = `INSERT INTO ims_schema.inventory(inventory_code,inventory_id,inventory_name,user_name) 
-        VALUES ($1,$2,$3,$4)`;
+        const insertNewInventoryQuery = `INSERT INTO ims_schema.inventory(inventory_id,inventory_name,user_code) 
+        VALUES ($1,$2,$3)`;
         await client.query(insertNewInventoryQuery, [
           inventoryId,
-          inventoryId,
           inventoryName,
-          userName,
+          user_code,
         ]);
       }
-
-      // Fetch the existing product catalogue
+      console.log(productCatalogue);
+      /* // Fetch the existing product catalogue
       const existingProductCatalogueQuery = `SELECT product_catalogue FROM ims_schema.inventory WHERE inventory_id=$1`;
       const existingProductCatalogueResult = await client.query(
         existingProductCatalogueQuery,
@@ -87,7 +80,7 @@ export default function inventoriesRouter(pool) {
           supplier_id,
           JSON.stringify(otherDetails),
         ]);
-      });
+      }); */
     } catch (err) {
       console.error(err);
     }

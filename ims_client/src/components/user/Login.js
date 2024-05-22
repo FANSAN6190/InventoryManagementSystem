@@ -24,7 +24,10 @@ function Login() {
   const navigate = useNavigate();
 
   const sendLoginData = useCallback(() => {
-    fetch(`${SERVER_URL}/login`, {
+    const loginData = { email, phone, password };
+    console.log("Sending login data:", loginData);
+
+    fetch(`${SERVER_URL}/auth/login`, {
       // replace with your server's address and port
       method: "POST",
       headers: {

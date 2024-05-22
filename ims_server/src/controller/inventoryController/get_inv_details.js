@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAuthenticated } from "../../server.js";
+import { checkAuthenticated } from "../authenticationController/authentication.js";
 
 export default function getInvDetailsRouter( pool){
     const router = express.Router();
@@ -7,7 +7,7 @@ export default function getInvDetailsRouter( pool){
         try {
         const client = await pool.connect();
         const inventoryResult = await client.query(
-            `SELECT inventory_name,inventory_id FROM ims_schema.inventory,ims_schema.users WHERE ims_schema.users.user_code='${req.user_code}' and ims_schema.users.user_name=ims_schema.inventory.user_name;`
+            `SELECT inventory_name, inventory_id FROM ims_schema.inventory, ims_schema.users WHERE ims_schema.inventory.user_code = '${req.user_code}';`
         );
         const results = {
             results: inventoryResult ? inventoryResult.rows : null,

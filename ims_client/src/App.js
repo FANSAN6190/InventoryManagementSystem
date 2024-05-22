@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./redux_store";
+
 import Main from "./components/Main/Main";
 import Dashboard from "./components/Dashboard/Dashboard";
 import MainContent from "./components/Main/MainContent";
@@ -26,7 +29,7 @@ function App() {
   // need to be removed later
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch(`${SERVER_URL}/check-login-status`, {
+      fetch(`${SERVER_URL}/auth/check-login-status`, {
         method: "GET",
         credentials: "include", // Include credentials for CORS requests
       })
@@ -44,23 +47,25 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Main>
-        <Routes>
-          <Route path="/" element={<MainContent />} />
-          <Route path="/dashboard" element={<DashboardWithAuthCheck />} />
-          <Route path="/products" element={<ProductDetailsWithAuthCheck />} />
-          <Route path="/suppliers" element={<SupplierDetailsWithAuthCheck />} />
-          <Route path="/inventory_status" element={<InventoryStatusWithAuthCheck />}/>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/add_update_inventory"
-            element={<RegisterUpdateInventoryWithAuthCheck />}
-          />
-        </Routes>
-      </Main>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <Main>
+          <Routes>
+            <Route path="/" element={<MainContent />} />
+            <Route path="/dashboard" element={<DashboardWithAuthCheck />} />
+            <Route path="/products" element={<ProductDetailsWithAuthCheck />} />
+            <Route path="/suppliers" element={<SupplierDetailsWithAuthCheck />} />
+            <Route path="/inventory_status" element={<InventoryStatusWithAuthCheck />}/>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/add_update_inventory"
+              element={<RegisterUpdateInventoryWithAuthCheck />}
+            />
+          </Routes>
+        </Main>
+      </Router>
+    </Provider>
   );
 }
 export default App;

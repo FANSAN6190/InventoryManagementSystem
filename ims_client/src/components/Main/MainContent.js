@@ -2,6 +2,7 @@ import React, { Fragment, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {checkLoginStatus} from "../user/withAuthCheck";
+import { useSelector } from 'react-redux';
 
 function MainContent() {
   const navigate = useNavigate();
@@ -13,6 +14,11 @@ function MainContent() {
       }
     });
   }, []);
+
+  let selInv = useSelector(state => state.inventory.selectedInventory);
+  let invs= useSelector(state => state.inventory.inventory_arr);
+  console.log(selInv);
+  console.log(invs);
 
   return (
     <Fragment>
@@ -56,6 +62,7 @@ function MainContent() {
           </Button>
         </div>
       </div>
+      <h1>{selInv}</h1>
     </Fragment>
   );
 }

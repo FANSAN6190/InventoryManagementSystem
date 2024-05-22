@@ -4,7 +4,7 @@ import "react-phone-input-2/lib/bootstrap.css";
 import { SERVER_URL } from "../../config";
 
 function Register() {
-  const [userName, setUserName] = useState("");
+  // const [user_id, setUserId] = useState("");
   const [fullName, setFullName] = useState("");
   const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
@@ -31,7 +31,7 @@ function Register() {
   const sendRegistrationData = (event) => {
     event.preventDefault();
     if (
-      userName &&
+      // user_id &&
       fullName &&
       dob &&
       email &&
@@ -41,30 +41,33 @@ function Register() {
       confirmPass
     ) {
       if (password !== confirmPass) {
-        console.log("passwords does not match");
+        alert("Passwords do not match");
       } else {
         // Send the registration data to the server
-        fetch(`${SERVER_URL}/register`, {
+        fetch(`${SERVER_URL}/auth/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userName,
+            // user_id,
             fullName,
             dob,
             email,
-            countryCode,
             phoneNo,
             password,
             confirmPass,
           }),
         })
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
           .then((data) => {
             console.log("Successfully Registered:", data);
-            alert("Account Registered Succesfully");
-            window.alert("Successfully Registered, Go to Login Page");
+            alert("Account Registered Successfully");
             setTimeout(() => {
               //navigate('/login');
               window.location.href = `/`;
@@ -72,17 +75,17 @@ function Register() {
           })
           .catch((error) => {
             console.error("Error:", error);
-            window.alert("Failed to Register, Try Again");
+            alert("Failed to Register, Try Again");
           });
       }
     } else {
-      console.log("enter all values");
+      alert("Please enter all values");
     }
   };
-
+    
   useEffect(() => {
     if (
-      userName &&
+      // user_id &&
       fullName &&
       dob &&
       email &&
@@ -98,7 +101,7 @@ function Register() {
       console.log("enter all values");
     }
   }, [
-    userName,
+    // user_id,
     fullName,
     dob,
     email,
@@ -124,26 +127,26 @@ function Register() {
         <h1 class="text-center">
           <strong>Register</strong>
         </h1>
-        <div class="form-group">
-          <label for="userName">User Name</label>
+        {/* <div class="form-group">
+          <label for="user_id">User ID</label>
           <input
             type="text"
             class="form-control"
-            id="userName"
+            id="user_id"
             pattern="^[A-Za-z0-9_]{8,20}$"
             onBlur={(e) => {
-              setUserName(e.target.value);
+              setUserId(e.target.value);
               e.target.setCustomValidity("");
               if (!e.target.validity.valid) {
                 e.target.setCustomValidity(
-                  "Username must be 6-20 characters long and can only contain alphanumeric characters and underscores."
+                  "User ID must be 6-20 characters long and can only contain alphanumeric characters and underscores."
                 );
               }
             }}
-            placeholder="Enter Username"
+            placeholder="Enter User ID"
             required
           ></input>
-        </div>
+        </div> */}
         <div class="form-group">
           <label for="fullName">Full Name</label>
           <input
