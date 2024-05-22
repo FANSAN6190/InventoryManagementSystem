@@ -4,7 +4,7 @@ import "react-phone-input-2/lib/bootstrap.css";
 import { SERVER_URL } from "../../config";
 
 function Register() {
-  const [user_id, setUserId] = useState("");
+  // const [user_id, setUserId] = useState("");
   const [fullName, setFullName] = useState("");
   const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
@@ -31,7 +31,7 @@ function Register() {
   const sendRegistrationData = (event) => {
     event.preventDefault();
     if (
-      user_id &&
+      // user_id &&
       fullName &&
       dob &&
       email &&
@@ -44,13 +44,13 @@ function Register() {
         alert("Passwords do not match");
       } else {
         // Send the registration data to the server
-        fetch(`${SERVER_URL}/register`, {
+        fetch(`${SERVER_URL}/auth/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user_id,
+            // user_id,
             fullName,
             dob,
             email,
@@ -85,7 +85,7 @@ function Register() {
     
   useEffect(() => {
     if (
-      user_id &&
+      // user_id &&
       fullName &&
       dob &&
       email &&
@@ -101,7 +101,7 @@ function Register() {
       console.log("enter all values");
     }
   }, [
-    user_id,
+    // user_id,
     fullName,
     dob,
     email,
@@ -127,7 +127,7 @@ function Register() {
         <h1 class="text-center">
           <strong>Register</strong>
         </h1>
-        <div class="form-group">
+        {/* <div class="form-group">
           <label for="user_id">User ID</label>
           <input
             type="text"
@@ -146,7 +146,7 @@ function Register() {
             placeholder="Enter User ID"
             required
           ></input>
-        </div>
+        </div> */}
         <div class="form-group">
           <label for="fullName">Full Name</label>
           <input

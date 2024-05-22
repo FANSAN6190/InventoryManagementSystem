@@ -29,7 +29,7 @@ function App() {
   // need to be removed later
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch(`${SERVER_URL}/check-login-status`, {
+      fetch(`${SERVER_URL}/auth/check-login-status`, {
         method: "GET",
         credentials: "include", // Include credentials for CORS requests
       })

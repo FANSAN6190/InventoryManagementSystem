@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAuthenticated } from "../../server.js";
+import { checkAuthenticated } from "../authenticationController/authentication.js";
 
 export default function inventoriesRouter(pool) {
   const router = express.Router();

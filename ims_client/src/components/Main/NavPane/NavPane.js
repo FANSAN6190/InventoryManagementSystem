@@ -112,7 +112,7 @@ function NavPane() {
   }
 
   function logout() {
-    fetch(`${SERVER_URL}/logout`, {
+    fetch(`${SERVER_URL}/auth/logout`, {
       method: "POST",
       credentials: "include", // include credentials to send the httpOnly cookie
     })
